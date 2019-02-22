@@ -1,0 +1,10 @@
+{
+    "base_url": "https://www.amazon.de/dp/",
+    "xpath_selector": "//*[@id='priceblock_ourprice']",
+    "items": [
+        "B073FGSC7T"
+    ],
+    "poll": 1800,
+    "poll_deviation": 600,
+    "check_timeout": 60
+}
