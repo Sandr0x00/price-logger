@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import json
 import time
 from datetime import date, datetime
@@ -13,9 +14,9 @@ import random
 
 def log_price(item_id: str, price):
     current_time = datetime.now().isoformat(timespec='minutes')
-    logger.info(f'{current_time} - {item_id} - {price:.2f}')
-    with open(f'../logs/{item_id}.txt', 'a+') as file:
-        file.write(f"{current_time} - {price:.2f}\n")
+    logger.info('{} - {} - {:.2f}'.format(current_time, item_id, price))
+    with open('../logs/{}.txt'.format(item_id), 'a+') as file:
+        file.write("{} - {:.2f}\n".format(current_time, price))
 
 
 def get_price(item):
@@ -53,7 +54,7 @@ def config_logger(debug):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config',
-        default='%s/config.json' % os.path.dirname(os.path.realpath(__file__)),
+        default='{}/config.json'.format(os.path.dirname(os.path.realpath(__file__))),
         help='Configuration file path')
     parser.add_argument('-d', '--debug',
         action='store_true',
@@ -72,7 +73,7 @@ def main():
     poll_interval = config["poll"]
     poll_deviation = config["poll_deviation"]
     check_timeout = config["check_timeout"]
-    logger.info(f"Configured poll intervall {poll_interval} Seconds with deviation of {poll_deviation} Seconds.")
+    logger.info("Configured poll intervall {} Seconds with deviation of {} Seconds.".format(poll_interval, poll_deviation))
 
     # build intervall list { "id": "next execution" }
     items = {}
