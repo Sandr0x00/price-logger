@@ -13,7 +13,7 @@ from urllib.parse import urljoin
 import random
 
 def log_price(item_id: str, price):
-    current_time = datetime.now().isoformat(timespec='minutes')
+    current_time = datetime.now().isoformat()
     logger.info('{} - {} - {:.2f}'.format(current_time, item_id, price))
     with open('../logs/{}.txt'.format(item_id), 'a+') as file:
         file.write("{} - {:.2f}\n".format(current_time, price))
@@ -30,7 +30,7 @@ def get_price(item):
     tree = html.fromstring(r.text)
     try:
         # extract the price from the string
-        price = re.findall('EUR \d+,\d\d', tree.xpath(selector)[0].text)[0]
+        price = re.findall(config['price_selector'], tree.xpath("//*[@id='priceblock_ourprice']")[0].text)[0]
         # we found the price, now cut "EUR " and parse english format
         log_price(item, float(price[4:].replace(',', '.')))
     except (IndexError, TypeError) as e:
@@ -64,11 +64,9 @@ def parse_args():
 
 def main():
     global config
-    global selector
     args = parse_args()
     config_logger(args.debug)
     config = get_config(args.config)
-    selector = config['xpath_selector']
 
     poll_interval = config["poll"]
     poll_deviation = config["poll_deviation"]
