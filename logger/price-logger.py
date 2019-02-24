@@ -30,9 +30,9 @@ def get_price(item):
     tree = html.fromstring(r.text)
     try:
         # extract the price from the string
-        price_string = re.findall('\d+.\d+', tree.xpath(selector)[0].text)[0]
-        price = float(price_string.replace(',', '.'))
-        log_price(item, price)
+        price = re.findall('EUR \d+,\d\d', tree.xpath(selector)[0].text)[0]
+        # we found the price, now cut "EUR " and parse english format
+        log_price(item, float(price[4:].replace(',', '.')))
     except (IndexError, TypeError) as e:
         logger.debug(e)
         logger.warning('Didn\'t find the \'price\' element, trying again later')
