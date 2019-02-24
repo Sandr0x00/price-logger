@@ -4,7 +4,7 @@
     "items": [
         "B073FGSC7T"
     ],
-    "poll": 18,
-    "poll_deviation": 6,
-    "check_timeout": 6
+    "poll": 1800,
+    "poll_deviation": 600,
+    "check_timeout": 60
 }
