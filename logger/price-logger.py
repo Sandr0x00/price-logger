@@ -21,21 +21,23 @@ def log_price(item_id: str, price):
 
 def get_price(item):
     url = urljoin(config['base_url'], item)
-    r = requests.Session().get(url, headers={
-        'User-Agent':
-            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
-            '(KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
-    })
-    r.raise_for_status()
-    tree = html.fromstring(r.text)
     try:
+        r = requests.get(url, headers={
+            'User-Agent':
+                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0'
+        })
+        r.raise_for_status()
+        tree = html.fromstring(r.text)
         # extract the price from the string
         price = re.findall(config['price_selector'], tree.xpath("//*[@id='priceblock_ourprice']")[0].text)[0]
         # we found the price, now cut "EUR " and parse english format
         log_price(item, float(price[4:].replace(',', '.')))
+    except requests.exceptions.RequestException as e:
+        logger.debug(e)
+        logger.warning('Can\'t connect, trying again later.')
     except (IndexError, TypeError) as e:
         logger.debug(e)
-        logger.warning('Didn\'t find the \'price\' element, trying again later')
+        logger.warning('Didn\'t find the \'price\' element, trying again later.')
 
 
 def get_config(config):
