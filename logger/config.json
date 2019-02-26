@@ -2,7 +2,8 @@
     "base_url": "https://www.amazon.de/dp/",
     "price_selector": "EUR \\d+,\\d\\d",
     "items": [
-        "B073FGSC7T"
+        "B073FGSC7T",
+        "B07BH47KC4"
     ],
     "poll": 1800,
     "poll_deviation": 600,
