@@ -3,9 +3,12 @@
     "price_selector": "EUR \\d+,\\d\\d",
     "items": [
         "B073FGSC7T",
-        "B07BH47KC4"
+        "B07BH47KC4",
+        "B005JCC8S6",
+        "B00008XX8F",
+        "B00008XVQE"
     ],
-    "poll": 1800,
-    "poll_deviation": 600,
+    "poll": 7200,
+    "poll_deviation": 1800,
     "check_timeout": 60
 }
