@@ -1,0 +1,11 @@
+extends layout.pug
+
+block content
+  div.container
+    div.row
+
+    h1 Items
+    div.row
+      each item in items
+        div.col-6.col-sm-4.col-md-3
+          a(href='/' + item)= item

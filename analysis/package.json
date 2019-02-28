@@ -1,0 +1,18 @@
+{
+  "name": "price-logger",
+  "author": "Sandro Bauer (https://github.com/Sandr0x00)",
+  "description": "A visualisation for data collected in logs.",
+  "license": "MIT",
+  "repository": "github:Sandr0x00/price-logger",
+  "dependencies": {
+    "d3": "^5.9.1",
+    "express": "^4.16.4",
+    "pug": "^2.0.3"
+  },
+  "devDependencies": {
+    "node-sass": "^4.11.0"
+  },
+  "scripts": {
+    "compile:sass": "node-sass sass -o public/css"
+  }
+}
