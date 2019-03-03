@@ -1,3 +1,5 @@
 node_modules/
+__pycache__
 public/css/*
 public/lib/*
+!public/lib/integrity.json

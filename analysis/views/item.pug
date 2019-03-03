@@ -3,5 +3,6 @@ extends layout.pug
 block content
   div.container-fluid
     div.row
-      h1= id
+      h1
+        a(href=link, target="_blank")= id
       div#price-chart(data-id=id)

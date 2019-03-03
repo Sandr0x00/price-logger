@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
-/* global __dirname, require, console, module */
+/* global __dirname, require, console, module, setTimeout */
 
 const express = require('express');
 const http = require('http');
 const app = express();
 const port = 5000;
 
-
 const fs = require('fs');
 let path = require('path');
+
+const config = getLoggerConfig();
 
 app.set('view engine', 'pug');
 app.locals.compileDebug = false;
@@ -24,11 +25,15 @@ Object.filter = (obj, predicate) => {
 };
 
 let json = loadLogs();
+// update json all 5 min
+setTimeout(() => {
+    json = loadLogs;
+}, 300000);
+
 // console.log(json);
+let integrity = getIntegrity();
 
 app.set('port', port);
-
-let d3 = '/js/d3.min.js';
 
 app.get('/api/:id', (req, res) => {
     setHeaders(res);
@@ -42,7 +47,7 @@ app.get('/api/:id', (req, res) => {
 app.get('/', (req, res) => {
     setHeaders(res);
     res.render('index', {
-        d3: d3,
+        integrity: integrity,
         items: Object.keys(json)
     });
 });
@@ -52,9 +57,10 @@ app.get('/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
     res.render('item', {
-        d3: d3,
+        integrity: integrity,
         id: id,
-        prices: json[id]
+        prices: json[id],
+        link: config['base_url'] + id
     });
 });
 
@@ -97,12 +103,28 @@ function loadLogs() {
 
 
 function setHeaders(res) {
-    // res.set('X-XSS-ProtectionType', '"1; mode=block"');
-    // res.set('X-Frame-Options', 'SAMEORIGIN');
-    // res.set('X-Content-Type-Options', 'nosniff');
-    // res.set('Strict-Transport-Security', '"max-age=31536000; includeSubDomains; preload"');
-    // res.set('Content-Security-Policy', 'default-src \'none\'; img-src \'self\'; style-src \'self\' stackpath.bootstrapcdn.com use.fontawesome.com; script-src \'self\' maxcdn.bootstrapcdn.com cdnjs.cloudflare.com code.jquery.com; font-src use.fontawesome.com');
-    // res.set('X-Permitted-Cross-Domain-Policies', '"none"');
-    // res.set('Referrer-Policy', 'no-referrer');
-    // res.set('Feature-Policy', 'accelerometer \'none\'; camera \'none\'; geolocation \'none\'; gyroscope \'none\'; magnetometer \'none\'; microphone \'none\'; payment \'none\'; usb \'none\'; sync-xhr \'none\'');
+    res.set('X-XSS-ProtectionType', '"1; mode=block"');
+    res.set('X-Frame-Options', 'SAMEORIGIN');
+    res.set('X-Content-Type-Options', 'nosniff');
+    res.set('Strict-Transport-Security', '"max-age=31536000; includeSubDomains; preload"');
+    res.set('Content-Security-Policy',
+        'default-src \'self\'; '
+        + 'img-src \'self\'; '
+        + 'style-src \'self\' stackpath.bootstrapcdn.com use.fontawesome.com; '
+        + 'script-src \'self\' maxcdn.bootstrapcdn.com cdnjs.cloudflare.com code.jquery.com; '
+        + 'font-src use.fontawesome.com; '
+        + 'require-sri-for script style;');
+    res.set('X-Permitted-Cross-Domain-Policies', '"none"');
+    res.set('Referrer-Policy', 'no-referrer');
+    res.set('Feature-Policy', 'accelerometer \'none\'; camera \'none\'; geolocation \'none\'; gyroscope \'none\'; magnetometer \'none\'; microphone \'none\'; payment \'none\'; usb \'none\'; sync-xhr \'none\'');
+}
+
+function getLoggerConfig() {
+    let p = path.join(__dirname, '..', 'logger', 'config.json');
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
+
+function getIntegrity() {
+    let p = path.join(__dirname, 'public', 'lib', 'integrity.json');
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
 }

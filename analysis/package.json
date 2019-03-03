@@ -1,18 +1,26 @@
 {
   "name": "price-logger",
   "author": "Sandro Bauer (https://github.com/Sandr0x00)",
-  "description": "A visualisation for data collected in logs.",
+  "private": true,
+  "description": "A visualisation for data collected by my logger in logs.",
   "license": "MIT",
   "repository": "github:Sandr0x00/price-logger",
   "dependencies": {
-    "d3": "^5.9.1",
     "express": "^4.16.4",
     "pug": "^2.0.3"
   },
   "devDependencies": {
-    "node-sass": "^4.11.0"
+    "bootstrap": "^4.3.1",
+    "d3": "^5.9.1",
+    "jquery": "^3.3.1",
+    "node-sass": "^4.11.0",
+    "popper.js": "^1.14.7"
   },
   "scripts": {
-    "compile:sass": "node-sass sass -o public/css"
+    "test": "eslint --ignore-path .gitignore .",
+    "build": "node-sass sass -o public/css && ./copy.sh && npm run test"
+  },
+  "bugs": {
+    "url": "https://github.com/Sandr0x00/price-logger/issues"
   }
 }

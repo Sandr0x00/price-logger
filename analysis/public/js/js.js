@@ -1,4 +1,4 @@
-/* global $, d3, window, XMLHttpRequest */
+/* global $, d3, window, XMLHttpRequest, setInterval, alert */
 
 function getJSON(url) {
     let xhr = new XMLHttpRequest();
