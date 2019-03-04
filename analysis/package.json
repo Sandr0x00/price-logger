@@ -18,7 +18,7 @@
   },
   "scripts": {
     "test": "eslint --ignore-path .gitignore .",
-    "build": "node-sass sass -o public/css && ./copy.sh && npm run test"
+    "build": "node-sass sass -o public/css && ./copy.py && npm run test"
   },
   "bugs": {
     "url": "https://github.com/Sandr0x00/price-logger/issues"

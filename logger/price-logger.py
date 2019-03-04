@@ -11,6 +11,7 @@ import logging
 from lxml import html
 from urllib.parse import urljoin
 import random
+import urllib
 
 def log_price(item_id: str, price):
     current_time = datetime.now().isoformat()
@@ -30,6 +31,8 @@ def get_price(item):
         tree = html.fromstring(r.text)
         # extract the price from the string
         price = re.findall(config['price_selector'], tree.xpath("//*[@id='priceblock_ourprice']")[0].text)[0]
+        if not os.path.isfile('../logs/{}.jpg'.format(item)):
+            get_image(item, tree)
         # we found the price, now cut "EUR " and parse english format
         log_price(item, float(price[4:].replace(',', '.')))
     except requests.exceptions.RequestException as e:
@@ -39,11 +42,9 @@ def get_price(item):
         logger.debug(e)
         logger.warning('Didn\'t find the \'price\' element, trying again later.')
 
-
 def get_config(config):
     with open(config, 'r') as f:
         return json.loads(f.read())
-
 
 def config_logger(debug):
     global logger
@@ -52,6 +53,11 @@ def config_logger(debug):
     handler = logging.StreamHandler()
     logger.addHandler(handler)
 
+def get_image(item, tree):
+    img = tree.xpath("//img[@id='landingImage']/@data-a-dynamic-image")[0]
+    obj = json.loads(img)
+    image_url = list(obj.keys())[0]
+    urllib.request.urlretrieve(image_url, "../logs/{}.jpg".format(item))
 
 def parse_args():
     parser = argparse.ArgumentParser()

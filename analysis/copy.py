@@ -50,7 +50,7 @@ if __name__ == "__main__":
         'jquery.min.js': copy('jquery/dist/jquery.min.js', 'jquery.min.js', True),
         'bootstrap.min.js': copy('bootstrap/dist/js/bootstrap.min.js', 'bootstrap.min.js', True, True),
         'bootstrap.min.css': copy('bootstrap/dist/css/bootstrap.min.css', 'bootstrap.min.css', src_map=True),
-        'popper.min.js': copy('popper.js/dist/popper.min.js', 'popper.min.js', True)
+        'popper.min.js': copy('popper.js/dist/umd/popper.min.js', 'popper.min.js', True, True)
     }
     with open('public/lib/integrity.json', 'w+') as f:
         f.write(json.dumps(obj))

@@ -1,14 +1,15 @@
 $color: #ffab00;
-$fill: none;
+
+.line, .minPrice, .overlay {
+  fill: none;
+}
 
 .line {
-  fill: $fill;
   stroke: $color;
   stroke-width: 3;
 }
 
 .overlay {
-  fill: $fill;
   pointer-events: all;
 }
 
@@ -16,4 +17,9 @@ $fill: none;
 .dot {
   fill: $color;
   stroke: #fff;
+}
+
+.minPrice {
+  stroke-width: 1;
+  stroke: black;
 }

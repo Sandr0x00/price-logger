@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-/* global __dirname, require, console, module, setTimeout */
+/* global __dirname, require, console, module, setInterval */
 
 const express = require('express');
 const http = require('http');
@@ -26,8 +26,9 @@ Object.filter = (obj, predicate) => {
 
 let json = loadLogs();
 // update json all 5 min
-setTimeout(() => {
-    json = loadLogs;
+setInterval(() => {
+    json = loadLogs();
+    console.log('update');
 }, 300000);
 
 // console.log(json);
@@ -80,9 +81,12 @@ function loadLogs() {
         let stats = fs.statSync(filePath);
         if (stats.isDirectory()) {
             console.log('There should be no directory here!');
-            return null;
+            return;
         }
         let key = path.parse(fileName).name;
+        if (path.parse(fileName).ext == '.jpg') {
+            return;
+        }
         let fileContent = fs.readFileSync(filePath, 'utf8').split('\n');
         let content = [];
         fileContent.forEach(row => {
