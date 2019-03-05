@@ -138,8 +138,8 @@ function updateGraph(data) {
     svg.select('#minPriceText')
         .transition()
         .duration(transitionDuration)
-        .attr('y', yScale(yMin))
-        .attr('x', width)
+        .attr('y', yScale(yMin) + 4)
+        .attr('x', width + 10)
         .text(yMin);
 
     // line generator
@@ -173,6 +173,8 @@ function updateGraph(data) {
         .data(data);
     dot.exit().remove();
     dot.enter().append('circle')
+        .on('mouseover', handleMouseOver)
+        .on('mouseout', handleMouseOut)
         .merge(dot)
         .transition()
         .duration(transitionDuration)
@@ -180,8 +182,6 @@ function updateGraph(data) {
         .attr('cx', d => xScale(d.time) )
         .attr('cy', d => yScale(d.price) )
         .attr('r', 5);
-    dot.on('mouseover', handleMouseOver)
-        .on('mouseout', handleMouseOut);
 }
 
 function getJSON(url, callback) {

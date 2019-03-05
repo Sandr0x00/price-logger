@@ -1,16 +1,12 @@
 $color: #ffab00;
 
-.line, .minPrice, .overlay {
+.line, .minPrice {
   fill: none;
 }
 
 .line {
   stroke: $color;
   stroke-width: 3;
-}
-
-.overlay {
-  pointer-events: all;
 }
 
 /* Style the dots by assigning a fill and stroke */
