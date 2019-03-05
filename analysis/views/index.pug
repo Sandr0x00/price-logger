@@ -1,11 +1,44 @@
-extends layout.pug
+doctype html
+html
+  head
+    title= title
+    link(rel="stylesheet", href="/lib/bootstrap.min.css")
+    link(rel="stylesheet", href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ", crossorigin="anonymous")
+    link(rel="stylesheet", href="/css/main.css")
+    link(rel="stylesheet", href="/css/graph.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+  body(class="")
+    if breadcrumbs
+      div.container
+        - var first = true;
+        each crumb in breadcrumbs
+          if !first
+            span= ' > '
+          a(href=crumb.link)= crumb.text
+          - first = false;
 
-block content
-  div.container
-    div.row
+    div.container
+      div.row
+        each item in items
+          div.col-6.col-sm-4.col-md-3
+            a.items(href="#", data-id=item)= item
+      div.row
+        if img
+          div.col-md-2
+            a.productLink
+              img.productImg
+        div#price-chart.col-md-10
 
-    h1 Items
-    div.row
-      each item in items
-        div.col-6.col-sm-4.col-md-3
-          a(href='/' + item)= item
+    script(type='text/javascript').
+      let itemId = !{JSON.stringify(id)};
+      let base_url = !{JSON.stringify(base_url)};
+    script(src="/lib/jquery.min.js")
+    script(src="/lib/bootstrap.min.js")
+    script(src="/lib/popper.min.js")
+    script(src="/lib/d3.min.js")
+    //- script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js", integrity="sha384-OuZnNj2WwX1/w4czTc03qpp27u8+mf9ah92yKpvVUo4Du0RzbxfS3tDuWKSYIQIo", crossorigin="anonymous")
+    //- script(src="/js/jquery.fittext.js")
+    script(src="/js/js.js")
+
+    //- div.col-1.offset-11
+    //-   a.float-right(href="/credits") Credits

@@ -1,4 +1,4 @@
-/* global $, d3, window, XMLHttpRequest, setInterval, console, document */
+/* global $, d3, window, XMLHttpRequest, setInterval, console, document, base_url, itemId */
 
 // prototypes
 Array.prototype.getMin = function(attrib) {
@@ -24,24 +24,21 @@ const marginRatio = {
     right: getRatio('right'),
     bottom: getRatio('bottom')
 };
-const DURATION_TIME = 500;
-
 const svg = d3.select('#price-chart').append('svg')
     .attr('preserveAspectRatio', 'xMinYMin meet')
     // .style('margin', marginRatio.top + ' ' + marginRatio.right + ' ' + marginRatio.bottom + ' ' + marginRatio.left)
-    .attr('viewBox', '0 0 ' + (width + margin.left + margin.right) + ' ' + (height + margin.top + margin.bottom)
-    )
+    .attr('viewBox', '0 0 ' + (width + margin.left + margin.right) + ' ' + (height + margin.top + margin.bottom))
     .append('g')
     .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
-let itemId = $('#price-chart').data('id');
+function change() {
+    document.title = itemId;
+    window.history.pushState({'pageTitle':itemId}, '', '/' + itemId);
 
-$(document).ready(() => {
-    $('.items').on('click', function() {
-        itemId = $(this).data('id');
-        getJSON(itemId);
-    });
-});
+    $('.productLink').attr('href', base_url + itemId);
+    $('.productImg').attr('src', '/img/' + itemId + '.jpg');
+    getJSON(itemId, updateGraph);
+}
 
 // init and update
 let xScale;
@@ -49,15 +46,13 @@ let yScale;
 let xAxis;
 let yAxis;
 let init = false;
-initGraph();
-getJSON(itemId);
 
-let t = d3.transition()
-    .duration(500);
+let transitionDuration = 0;
 
 setInterval(function() {
-    getJSON(itemId);
-}, 3000);
+    // only update json
+    getJSON(itemId, updateGraph);
+}, 30000);
 
 // mouse handlers
 function handleMouseOut(d, i) {
@@ -91,7 +86,6 @@ function initGraph() {
 
     // line graph
     svg.append('path')
-        .datum(['dummy']) // dummy data
         .attr('class', 'line');
 
     // x axis
@@ -134,14 +128,16 @@ function updateGraph(data) {
     xAxis.scale(xScale);
 
     svg.select('#minPriceLine')
-        .transition(t)
+        .transition()
+        .duration(transitionDuration)
         .attr('x1', 0)
         .attr('x2', width)
         .attr('y1', yScale(yMin))
         .attr('y2', yScale(yMin))
         .attr('class', 'minPrice');
     svg.select('#minPriceText')
-        .transition(t)
+        .transition()
+        .duration(transitionDuration)
         .attr('y', yScale(yMin))
         .attr('x', width)
         .text(yMin);
@@ -153,18 +149,23 @@ function updateGraph(data) {
 
     let x = svg.selectAll('.x.axis');
     let newX = x.enter().append('g');
-    x.merge(newX).transition(t)
+    x.merge(newX).transition()
+        .duration(transitionDuration)
         .call(xAxis);
 
     let y = svg.select('.y.axis');
     let newY = y.enter().append('g');
-    y.merge(newY).transition(t)
+    y.merge(newY).transition()
+        .duration(transitionDuration)
         .call(yAxis);
 
-    svg.select('path')
-        .datum(data)
-        .attr('class', 'line')
-        .transition(t)
+    let lineGraph = svg.select('.line')
+        .datum(data);
+    lineGraph.exit().remove();
+    lineGraph.enter().append('path')
+        .merge(lineGraph)
+        .transition()
+        .duration(transitionDuration)
         .attr('d', line);
 
     // Append a circle for each datapoint
@@ -173,7 +174,8 @@ function updateGraph(data) {
     dot.exit().remove();
     dot.enter().append('circle')
         .merge(dot)
-        .transition(t)
+        .transition()
+        .duration(transitionDuration)
         .attr('class', 'dot')
         .attr('cx', d => xScale(d.time) )
         .attr('cy', d => yScale(d.price) )
@@ -182,15 +184,15 @@ function updateGraph(data) {
         .on('mouseout', handleMouseOut);
 }
 
-
-function getJSON(url) {
+function getJSON(url, callback) {
     let xhr = new XMLHttpRequest();
     xhr.open('get', '/api/' + url, true);
     xhr.responseType = 'json';
-    xhr.onload = function() {
+    xhr.onload = () => {
         let status = xhr.status;
         if (status == 200) {
-            updateGraph(xhr.response);
+            callback(xhr.response);
+            transitionDuration = 500;
         } else {
             console.log('Something went wrong: ' + xhr.statusText);
         }
@@ -198,3 +200,12 @@ function getJSON(url) {
     xhr.send();
 };
 
+$(document).ready(() => {
+    $('.items').on('click', function() {
+        itemId = $(this).data('id');
+        change();
+    });
+
+    initGraph();
+    change();
+});

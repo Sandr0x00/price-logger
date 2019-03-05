@@ -66,13 +66,13 @@ app.get('/:id', (req, res) => {
         img = '/img/' + id + '.jpg';
     }
 
-    res.render('item', {
+    res.render('index', {
         // integrity: integrity,
         items: Object.keys(json),
         img: img,
         id: id,
         prices: json[id],
-        link: config['base_url'] + id
+        base_url: config['base_url']
     });
 });
 
@@ -139,7 +139,7 @@ function setHeaders(res) {
         'default-src \'self\'; '
         + 'img-src \'self\'; '
         + 'style-src \'self\' \'unsafe-inline\' stackpath.bootstrapcdn.com use.fontawesome.com; '
-        + 'script-src \'self\' maxcdn.bootstrapcdn.com cdnjs.cloudflare.com code.jquery.com; '
+        + 'script-src \'self\' \'unsafe-inline\' maxcdn.bootstrapcdn.com cdnjs.cloudflare.com code.jquery.com; '
         + 'font-src use.fontawesome.com; '
         + 'require-sri-for script style;');
     res.set('X-Permitted-Cross-Domain-Policies', '"none"');
