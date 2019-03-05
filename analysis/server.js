@@ -67,7 +67,8 @@ app.get('/:id', (req, res) => {
     }
 
     res.render('item', {
-        integrity: integrity,
+        // integrity: integrity,
+        items: Object.keys(json),
         img: img,
         id: id,
         prices: json[id],
