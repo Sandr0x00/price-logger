@@ -21,8 +21,8 @@ def sha384OfFile(filepath:str):
 def copy(cp_from:str, cp_to:str, eslint_disable:bool=False, src_map:bool=False):
     with open(f'node_modules/{cp_from}') as f:
         file_str = f.read()
-    if eslint_disable:
-        file_str = '/* eslint-disable */\n' + file_str
+    # if eslint_disable:
+        # file_str = '/* eslint-disable */\n' + file_str
     with open(f'public/lib/{cp_to}', 'w+') as f:
         f.write(file_str)
     int_sha384 = sriOfFile(f'public/lib/{cp_to}')

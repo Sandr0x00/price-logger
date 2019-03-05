@@ -17,7 +17,7 @@
     "popper.js": "^1.14.7"
   },
   "scripts": {
-    "test": "eslint --ignore-path .gitignore .",
+    "test": "eslint .",
     "build": "node-sass sass -o public/css && ./copy.py && npm run test"
   },
   "bugs": {

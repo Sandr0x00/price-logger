@@ -1,25 +1,3 @@
-$color: #ffab00;
-
-.line, .minPrice, .overlay {
-  fill: none;
-}
-
-.line {
-  stroke: $color;
-  stroke-width: 3;
-}
-
-.overlay {
-  pointer-events: all;
-}
-
-/* Style the dots by assigning a fill and stroke */
-.dot {
-  fill: $color;
-  stroke: #fff;
-}
-
-.minPrice {
-  stroke-width: 1;
-  stroke: black;
+img {
+    width: 100%;
 }

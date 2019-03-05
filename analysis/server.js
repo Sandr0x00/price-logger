@@ -17,6 +17,8 @@ app.locals.compileDebug = false;
 app.locals.cache = true;
 app.use(express.static('public'));
 
+const publicImgDir = 'public/img';
+
 
 Object.filter = (obj, predicate) => {
     return Object.keys(obj)
@@ -28,7 +30,6 @@ let json = loadLogs();
 // update json all 5 min
 setInterval(() => {
     json = loadLogs();
-    console.log('update');
 }, 300000);
 
 // console.log(json);
@@ -57,8 +58,17 @@ app.get('/', (req, res) => {
 app.get('/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
+
+    let img = publicImgDir + '/' + id + '.jpg';
+    if (!fs.existsSync(img)) {
+        img = null;
+    } else {
+        img = '/img/' + id + '.jpg';
+    }
+
     res.render('item', {
         integrity: integrity,
+        img: img,
         id: id,
         prices: json[id],
         link: config['base_url'] + id
@@ -83,8 +93,21 @@ function loadLogs() {
             console.log('There should be no directory here!');
             return;
         }
-        let key = path.parse(fileName).name;
-        if (path.parse(fileName).ext == '.jpg') {
+        let file = path.parse(fileName);
+        let key = file.name;
+        if (file.ext == '.jpg') {
+            // copy img to public dir
+            if (!fs.existsSync(publicImgDir)) {
+                fs.mkdirSync(publicImgDir);
+            }
+            if (!fs.existsSync(publicImgDir + '/' + file.base)) {
+                console.log(dirPath + '/' + file.base);
+                if (fs.existsSync(dirPath + '/' + file.base)) {
+                    let inStr = fs.createReadStream(dirPath + '/' + file.base);
+                    let outStr = fs.createWriteStream(publicImgDir + '/' + file.base);
+                    inStr.pipe(outStr);
+                }
+            }
             return;
         }
         let fileContent = fs.readFileSync(filePath, 'utf8').split('\n');
@@ -114,7 +137,7 @@ function setHeaders(res) {
     res.set('Content-Security-Policy',
         'default-src \'self\'; '
         + 'img-src \'self\'; '
-        + 'style-src \'self\' stackpath.bootstrapcdn.com use.fontawesome.com; '
+        + 'style-src \'self\' \'unsafe-inline\' stackpath.bootstrapcdn.com use.fontawesome.com; '
         + 'script-src \'self\' maxcdn.bootstrapcdn.com cdnjs.cloudflare.com code.jquery.com; '
         + 'font-src use.fontawesome.com; '
         + 'require-sri-for script style;');
