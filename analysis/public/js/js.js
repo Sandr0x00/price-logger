@@ -36,7 +36,7 @@ function change() {
     window.history.pushState({'pageTitle':itemId}, '', '/' + itemId);
 
     $('.productLink').attr('href', base_url + itemId);
-    $('.productImg').attr('src', '/img/' + itemId + '.jpg');
+    $('.productImg').attr('src', '/img/' + itemId);
     getJSON(itemId, updateGraph);
 }
 

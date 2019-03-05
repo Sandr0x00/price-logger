@@ -5,37 +5,33 @@
 const express = require('express');
 const http = require('http');
 const app = express();
-const port = 5000;
+const port = 3001;
 
 const fs = require('fs');
 let path = require('path');
 
 const config = getLoggerConfig();
 
+app.set('port', port);
 app.set('view engine', 'pug');
 app.locals.compileDebug = false;
 app.locals.cache = true;
 app.use(express.static('public'));
 
-const publicImgDir = 'public/img';
-
-
 Object.filter = (obj, predicate) => {
     return Object.keys(obj)
-          .filter(key => predicate(obj[key]))
-          .reduce((res, key) => (res[key] = obj[key], res), {});
+        .filter(key => predicate(obj[key]))
+        .reduce((res, key) => (res[key] = obj[key], res), {});
 };
 
 let json = loadLogs();
-// update json all 5 min
+// cyclic update
 setInterval(() => {
     json = loadLogs();
 }, 300000);
 
-// console.log(json);
+// currently, this is not needed
 let integrity = getIntegrity();
-
-app.set('port', port);
 
 app.get('/api/:id', (req, res) => {
     setHeaders(res);
@@ -45,36 +41,35 @@ app.get('/api/:id', (req, res) => {
     }
 });
 
+app.get('/img/:id', (req, res) => {
+    setHeaders(res);
+    let id = req.params.id;
+    let img = path.join(__dirname, '..', 'logs', `${id}.jpg`);
+    if (!fs.existsSync(img)) {
+        res.sendFile('public/img/unknown.jpg', { root: __dirname });
+    } else {
+        res.sendFile(img);
+    }
+});
 
 app.get('/', (req, res) => {
     setHeaders(res);
-    res.render('index', {
-        integrity: integrity,
-        items: Object.keys(json)
-    });
+    render(res, Object.keys(json)[0]);
 });
-
 
 app.get('/:id', (req, res) => {
     setHeaders(res);
-    let id = req.params.id;
+    render(res, req.params.id);
+});
 
-    let img = publicImgDir + '/' + id + '.jpg';
-    if (!fs.existsSync(img)) {
-        img = null;
-    } else {
-        img = '/img/' + id + '.jpg';
-    }
-
+function render(res, id) {
     res.render('index', {
-        // integrity: integrity,
         items: Object.keys(json),
-        img: img,
         id: id,
         prices: json[id],
         base_url: config['base_url']
     });
-});
+}
 
 const server = http.createServer(app);
 server.listen(port, (err) => {
@@ -97,18 +92,6 @@ function loadLogs() {
         let file = path.parse(fileName);
         let key = file.name;
         if (file.ext == '.jpg') {
-            // copy img to public dir
-            if (!fs.existsSync(publicImgDir)) {
-                fs.mkdirSync(publicImgDir);
-            }
-            if (!fs.existsSync(publicImgDir + '/' + file.base)) {
-                console.log(dirPath + '/' + file.base);
-                if (fs.existsSync(dirPath + '/' + file.base)) {
-                    let inStr = fs.createReadStream(dirPath + '/' + file.base);
-                    let outStr = fs.createWriteStream(publicImgDir + '/' + file.base);
-                    inStr.pipe(outStr);
-                }
-            }
             return;
         }
         let fileContent = fs.readFileSync(filePath, 'utf8').split('\n');
@@ -136,11 +119,11 @@ function setHeaders(res) {
     res.set('X-Content-Type-Options', 'nosniff');
     res.set('Strict-Transport-Security', '"max-age=31536000; includeSubDomains; preload"');
     res.set('Content-Security-Policy',
-        'default-src \'self\'; '
-        + 'img-src \'self\'; '
-        + 'style-src \'self\' \'unsafe-inline\' stackpath.bootstrapcdn.com use.fontawesome.com; '
-        + 'script-src \'self\' \'unsafe-inline\' maxcdn.bootstrapcdn.com cdnjs.cloudflare.com code.jquery.com; '
-        + 'font-src use.fontawesome.com; '
+        'default-src \'self\';'
+        + 'img-src \'self\';'
+        + 'style-src \'self\' \'unsafe-inline\' use.fontawesome.com;'
+        + 'script-src \'self\' \'unsafe-inline\';'
+        + 'font-src use.fontawesome.com;'
         + 'require-sri-for script style;');
     res.set('X-Permitted-Cross-Domain-Policies', '"none"');
     res.set('Referrer-Policy', 'no-referrer');
