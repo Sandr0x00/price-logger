@@ -3,6 +3,7 @@
 /* global __dirname, require, console, module, setInterval */
 
 const express = require('express');
+const compression = require('compression');
 const http = require('http');
 const app = express();
 const port = 3001;
@@ -17,6 +18,7 @@ app.set('view engine', 'pug');
 app.locals.compileDebug = false;
 app.locals.cache = true;
 app.use(express.static('public'));
+app.use(compression());
 
 Object.filter = (obj, predicate) => {
     return Object.keys(obj)
@@ -28,7 +30,7 @@ let json = loadLogs();
 // cyclic update
 setInterval(() => {
     json = loadLogs();
-}, 300000);
+}, 30000);
 
 // currently, this is not needed
 let integrity = getIntegrity();

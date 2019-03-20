@@ -1,11 +1,7 @@
 {
-  "name": "price-logger",
-  "author": "Sandro Bauer (https://github.com/Sandr0x00)",
   "private": true,
-  "description": "A visualisation for data collected by my logger in logs.",
-  "license": "MIT",
-  "repository": "github:Sandr0x00/price-logger",
   "dependencies": {
+    "compression": "^1.7.4",
     "express": "^4.16.4",
     "pug": "^2.0.3"
   },
@@ -18,9 +14,9 @@
   },
   "scripts": {
     "test": "eslint .",
-    "build": "node-sass sass -o public/css && ./copy.py && npm run test"
-  },
-  "bugs": {
-    "url": "https://github.com/Sandr0x00/price-logger/issues"
+    "build:dev": "node-sass sass -o public/css && ./copy.py && npm run test",
+    "build:prod": "npm run build:dev && tar -czf analysis.tar.gz public views package.json package-lock.json server.js",
+    "deploy:copy": "scp analysis.tar.gz analysis.service pi@raspberrypi.fritz.box:~",
+    "deploy:install": "ssh pi@raspberrypi.fritz.box 'bash -s' < deploy.sh"
   }
 }

@@ -12,6 +12,7 @@ from lxml import html
 from urllib.parse import urljoin
 import random
 import urllib
+import mail
 
 def log_price(item_id: str, price):
     current_time = datetime.now().isoformat()
@@ -21,9 +22,8 @@ def log_price(item_id: str, price):
 
 
 def get_price(item):
-    url = urljoin(config['base_url'], item)
     try:
-        r = requests.get(url, headers={
+        r = requests.get(items[item]['url'], headers={
             'User-Agent':
                 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0'
         })
@@ -34,12 +34,17 @@ def get_price(item):
         if not os.path.isfile('../logs/{}.jpg'.format(item)):
             get_image(item, tree)
         # we found the price, now cut "EUR " and parse english format
-        log_price(item, float(price[4:].replace(',', '.')))
+        price_f = float(price[4:].replace(',', '.'))
+        log_price(item, price_f)
+        if price_f < items[item]['threshold']:
+            mail.send_mail(config['mail'], item, price_f)
     except requests.exceptions.RequestException as e:
         logger.debug(e)
+        mail.send_error(config['mail'], e)
         logger.warning('Can\'t connect, trying again later.')
     except (IndexError, TypeError) as e:
         logger.debug(e)
+        mail.send_error(config['mail'], e)
         logger.warning('Didn\'t find the \'price\' element, trying again later.')
 
 def get_config(config):
@@ -72,31 +77,43 @@ def parse_args():
 
 def main():
     global config
+    global items
+
     args = parse_args()
     config_logger(args.debug)
     config = get_config(args.config)
 
     poll_interval = config["poll"]
     poll_deviation = config["poll_deviation"]
-    check_timeout = config["check_timeout"]
     logger.info("Configured poll intervall {} Seconds with deviation of {} Seconds.".format(poll_interval, poll_deviation))
 
-    # build intervall list { "id": "next execution" }
+    # build intervall list
+    # {
+    #   "id": {
+    #     "next_exec": "next execution time",
+    #     "threshold": "threshold for email",
+    #     "url": "item url"
+    #   }, ...
+    # }
     items = {}
     for item in config['items']:
         initial_delay = random.randint(0, poll_interval)
         current_time = datetime.now().timestamp()
-        items[item] = current_time + initial_delay
+        items[item['id']] = {
+            'next_exec': current_time + initial_delay,
+            'threshold': item['threshold'],
+            'url': urljoin(config['base_url'], item['id'])
+        }
 
     while True:
         current_time = datetime.now().timestamp()
 
-        for item, next_exec in items.items():
-            if next_exec < current_time:
-                get_price(item)
-                items[item] = current_time + random.randint(poll_interval - poll_deviation, poll_interval + poll_deviation)
+        for item_id, data in items.items():
+            if data['next_exec'] < current_time:
+                get_price(item_id)
+                data['next_exec'] = current_time + random.randint(poll_interval - poll_deviation, poll_interval + poll_deviation)
 
-        time.sleep(check_timeout)
+        time.sleep(config["check_timeout"])
 
 
 if __name__ == '__main__':

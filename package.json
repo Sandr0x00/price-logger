@@ -1,0 +1,11 @@
+{
+  "name": "price-logger",
+  "author": "Sandro Bauer (https://github.com/Sandr0x00)",
+  "private": true,
+  "description": "A logger for prices from Amazon.",
+  "license": "MIT",
+  "repository": "github:Sandr0x00/price-logger",
+  "bugs": {
+    "url": "https://github.com/Sandr0x00/price-logger/issues"
+  }
+}

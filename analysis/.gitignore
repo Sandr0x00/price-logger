@@ -3,3 +3,4 @@ __pycache__
 public/css/*
 public/lib/*
 !public/lib/integrity.json
+analysis.tar.gz
