@@ -17,8 +17,8 @@ logger$ npm run start
 
 ### Visualization
 ```shell
-analysis$ npm run build:dev
-analysis$ npm start
+visualization$ npm run build:dev
+visualization$ npm start
 ```
 
 ## Deploy to production
@@ -32,9 +32,9 @@ logger$ npm run deploy:install
 
 ### Visualization
 ```shell
-analysis$ npm run build:prod
-analysis$ npm run deploy:copy
-analysis$ npm run deploy:install
+visualization$ npm run build:prod
+visualization$ npm run deploy:copy
+visualization$ npm run deploy:install
 ```
 
 
