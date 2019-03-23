@@ -11,7 +11,7 @@ const port = 3001;
 const fs = require('fs');
 let path = require('path');
 
-const config = getLoggerConfig();
+const config = loadJSON(path.join(__dirname, '..', 'logger', 'config.json'));
 
 app.set('port', port);
 app.set('view engine', 'pug');
@@ -33,9 +33,9 @@ setInterval(() => {
 }, 30000);
 
 // currently, this is not needed
-let integrity = getIntegrity();
+// let integrity = loadJSON(path.join(__dirname, 'public', 'lib', 'integrity.json'));
 
-app.get('/api/:id', (req, res) => {
+app.get('/prices/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
     if (Object.keys(json).includes(id)) {
@@ -54,6 +54,21 @@ app.get('/img/:id', (req, res) => {
     }
 });
 
+app.get('/infos/:id', (req, res) => {
+    setHeaders(res);
+    let id = req.params.id;
+    if (Object.keys(json).includes(id) && json[id].title) {
+        res.send(json[id].title);
+    } else {
+        res.sendStatus(500);
+    }
+});
+
+app.get('/items', (req, res) => {
+    setHeaders(res);
+    res.send(Object.keys(json));
+});
+
 app.get('/', (req, res) => {
     setHeaders(res);
     render(res, Object.keys(json)[0]);
@@ -65,10 +80,13 @@ app.get('/:id', (req, res) => {
 });
 
 function render(res, id) {
+    if (!Object.keys(json).includes(id)) {
+        console.log(`render for id="${id}" requested, but missing`);
+        return;
+    }
     res.render('index', {
         items: Object.keys(json),
         id: id,
-        prices: json[id],
         base_url: config['base_url']
     });
 }
@@ -93,7 +111,7 @@ function loadLogs() {
         }
         let file = path.parse(fileName);
         let key = file.name;
-        if (file.ext == '.jpg') {
+        if (file.ext != '.txt') {
             return;
         }
         let fileContent = fs.readFileSync(filePath, 'utf8').split('\n');
@@ -108,8 +126,14 @@ function loadLogs() {
                 'price': row[1]
             });
         });
-        logs[key] = content;
+        logs[key] = {};
+        logs[key].prices = content;
         logs[key].id = key;
+        // try to add additional infos
+        let infos = loadJSON(path.join(__dirname, '..', 'logs', `${key}.json`));
+        if (infos) {
+            logs[key] = Object.assign(infos, logs[key]);
+        }
     });
     return logs;
 };
@@ -132,12 +156,9 @@ function setHeaders(res) {
     res.set('Feature-Policy', 'accelerometer \'none\'; camera \'none\'; geolocation \'none\'; gyroscope \'none\'; magnetometer \'none\'; microphone \'none\'; payment \'none\'; usb \'none\'; sync-xhr \'none\'');
 }
 
-function getLoggerConfig() {
-    let p = path.join(__dirname, '..', 'logger', 'config.json');
-    return JSON.parse(fs.readFileSync(p, 'utf8'));
-}
-
-function getIntegrity() {
-    let p = path.join(__dirname, 'public', 'lib', 'integrity.json');
+function loadJSON(p) {
+    if (!fs.existsSync(p)) {
+        return null;
+    }
     return JSON.parse(fs.readFileSync(p, 'utf8'));
 }

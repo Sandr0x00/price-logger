@@ -1,4 +1,7 @@
-/* global $, d3, window, XMLHttpRequest, setInterval, console, document, base_url, itemId */
+/* global $, d3, window, XMLHttpRequest, setInterval, console, document, base_url, itemId, title */
+
+let title;
+let items = [];
 
 // prototypes
 Array.prototype.getMin = function(attrib) {
@@ -32,12 +35,15 @@ const svg = d3.select('#price-chart').append('svg')
     .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
 function change() {
-    document.title = itemId;
-    window.history.pushState({'pageTitle':itemId}, '', '/' + itemId);
+    getJSON(itemId, updateGraph);
+    document.title = `Price-Logger | ${title}`;
+    window.history.pushState({'pageTitle':title}, '', '/' + itemId);
 
     $('.productLink').attr('href', base_url + itemId);
     $('.productImg').attr('src', '/img/' + itemId);
-    getJSON(itemId, updateGraph);
+
+    $('.items').removeClass('current');
+    $(`#${itemId}`).addClass('current');
 }
 
 // init and update
@@ -52,6 +58,7 @@ let transitionDuration = 0;
 setInterval(function() {
     // only update json
     getJSON(itemId, updateGraph);
+    loadItems();
 }, 30000);
 
 // mouse handlers
@@ -115,11 +122,17 @@ function updateGraph(data) {
     if (!init) {
         return;
     }
+    if (data.title) {
+        title = data.title;
+    } else {
+        title = data.id;
+    }
+    const prices =  data.prices;
 
-    const yMin = data.getMin('price')['price'];
-    const yMax = data.getMax('price')['price'];
-    const xMin = data.getMin('time')['time'];
-    const xMax = data.getMax('time')['time'];
+    const yMin = prices.getMin('price')['price'];
+    const yMax = prices.getMax('price')['price'];
+    const xMin = prices.getMin('time')['time'];
+    const xMax = prices.getMax('time')['time'];
     const diff = (yMax - yMin) * 0.1;
 
     xScale.domain([xMin, xMax]);
@@ -160,7 +173,7 @@ function updateGraph(data) {
         .call(yAxis);
 
     let lineGraph = svg.select('.line')
-        .datum(data);
+        .datum(prices);
     lineGraph.exit().remove();
     lineGraph.enter().append('path')
         .merge(lineGraph)
@@ -170,7 +183,7 @@ function updateGraph(data) {
 
     // Append a circle for each datapoint
     let dot = svg.selectAll('.dot')
-        .data(data);
+        .data(prices);
     dot.exit().remove();
     dot.enter().append('circle')
         .on('mouseover', handleMouseOver)
@@ -186,7 +199,7 @@ function updateGraph(data) {
 
 function getJSON(url, callback) {
     let xhr = new XMLHttpRequest();
-    xhr.open('get', '/api/' + url, true);
+    xhr.open('get', '/prices/' + url, true);
     xhr.responseType = 'json';
     xhr.onload = () => {
         let status = xhr.status;
@@ -200,12 +213,54 @@ function getJSON(url, callback) {
     xhr.send();
 };
 
+function loadItems() {
+    let xhr = new XMLHttpRequest();
+    xhr.open('get', '/items', true);
+    xhr.responseType = 'json';
+    xhr.onload = () => {
+        let status = xhr.status;
+        if (status == 200) {
+            if (xhr.response.length === items.length && xhr.response.sort().every((value, index) => value === items.sort()[index])) {
+                return;
+            }
+            $('#sidebar').empty();
+            items = xhr.response;
+            // create items
+            items.forEach(element => {
+                $('#sidebar').append(`<a class="list-group-item items" href="#" data-id="${element}" id="${element}">${element}</a>`);
+            });
+            // add click action
+            $('.items').on('click', function() {
+                itemId = $(this).data('id');
+                change();
+            });
+            // update item name
+            $('.items').each(function() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', '/infos/' + $(this).data('id'), true);
+                xhr.onload = () => {
+                    let status = xhr.status;
+                    if (status == 200) {
+                        $(this).text(xhr.response);
+                    } else {
+                        // do not update text
+                    }
+                };
+                xhr.send();
+            });
+        }
+    };
+    xhr.send();
+}
+
 $(document).ready(() => {
-    $('.items').on('click', function() {
-        itemId = $(this).data('id');
-        change();
-    });
+    loadItems();
 
     initGraph();
     change();
+
+    $('#menu-toggle').click(function(e) {
+        e.preventDefault();
+        $('#wrapper').toggleClass('toggled');
+      });
 });

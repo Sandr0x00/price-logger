@@ -33,6 +33,8 @@ def get_price(item):
         price = re.findall(config['price_selector'], tree.xpath("//*[@id='priceblock_ourprice']")[0].text)[0]
         if not os.path.isfile('../logs/{}.jpg'.format(item)):
             get_image(item, tree)
+        if not os.path.isfile('../logs/{}.json'.format(item)):
+            get_infos(item, tree)
         # we found the price, now cut "EUR " and parse english format
         price_f = float(price[4:].replace(',', '.'))
         log_price(item, price_f)
@@ -63,6 +65,15 @@ def get_image(item, tree):
     obj = json.loads(img)
     image_url = list(obj.keys())[0]
     urllib.request.urlretrieve(image_url, "../logs/{}.jpg".format(item))
+
+def get_infos(item, tree):
+    title = tree.xpath("//span[@id='productTitle']")[0].text.strip()
+    obj = {
+        "title": title
+    }
+    with open('../logs/{}.json'.format(item), 'w+') as file:
+        file.write(json.dumps(obj, sort_keys=True, indent=4))
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
