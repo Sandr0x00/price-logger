@@ -4,6 +4,8 @@ Just a small price logger to check when an item on Amazon is cheap. Because appa
 
 Could be used for other sites aswell.
 
+![](readme.png)
+Controller blurred for copyright reasons.
 
 # Scripts
 
