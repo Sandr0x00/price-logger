@@ -3,7 +3,7 @@
   "scripts": {
     "install": "pip3 install -r requirements.txt",
     "start": "python3 price-logger.py",
-    "build": "tar -czf logger.tar.gz config.json mail.py price-logger.py requirements.txt",
+    "build": "tar -czf logger.tar.gz config.json mail.py price-logger.py image.py requirements.txt",
     "deploy:copy": "scp logger.tar.gz logger.service pi@raspberrypi.fritz.box:~",
     "deploy:install": "ssh pi@raspberrypi.fritz.box 'bash -s' < deploy.sh",
     "deploy:config": "scp config.json pi@raspberrypi.fritz.box:~ && ssh pi@raspberrypi.fritz.box 'mv config.json ~/price-logger/logger/config.json && sudo systemctl restart logger'",

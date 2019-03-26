@@ -7,6 +7,7 @@ html
     link(rel="stylesheet", href="/css/main.css")
     link(rel="stylesheet", href="/css/graph.css")
     link(rel="stylesheet", href="/css/sidebar.css")
+    link(rel="stylesheet", href="/css/image.css")
     meta(name="viewport", content="width=device-width, initial-scale=1")
   body
   div.d-flex#wrapper
@@ -14,6 +15,7 @@ html
     //- Sidebar
     div.bg-light.border-right#sidebar-wrapper
       div.list-group.list-group-flush#sidebar
+      div#status
 
     //- Page Content
     div#page-content-wrapper
@@ -21,9 +23,12 @@ html
         div.row
           div.col-md-2.col-4
             a.productLink
-              img.productImg
+              div.productImg
           div#price-chart.col-md-10.col-8
-      a#menu-toggle Testical
+      a#menu-toggle.d-block.d-md-none
+        i.fas.fa-bars
+
+
 
     script(type='text/javascript').
       let itemId = !{JSON.stringify(id)};
@@ -34,4 +39,6 @@ html
     script(src="/lib/d3.min.js")
     //- script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js", integrity="sha384-OuZnNj2WwX1/w4czTc03qpp27u8+mf9ah92yKpvVUo4Du0RzbxfS3tDuWKSYIQIo", crossorigin="anonymous")
     //- script(src="/js/jquery.fittext.js")
+    script(src="/js/images.js")
+    script(src="/js/graph.js")
     script(src="/js/js.js")

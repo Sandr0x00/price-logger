@@ -11,8 +11,8 @@ import logging
 from lxml import html
 from urllib.parse import urljoin
 import random
-import urllib
 import mail
+import image
 
 def log_price(item_id: str, price):
     current_time = datetime.now().isoformat()
@@ -32,7 +32,9 @@ def get_price(item):
         # extract the price from the string
         price = re.findall(config['price_selector'], tree.xpath("//*[@id='priceblock_ourprice']")[0].text)[0]
         if not os.path.isfile('../logs/{}.jpg'.format(item)):
-            get_image(item, tree)
+            image.save_image(item, tree)
+        if not os.path.isfile('../logs/{}.thumbnail'.format(item)):
+            image.save_thumbnail(item)
         if not os.path.isfile('../logs/{}.json'.format(item)):
             get_infos(item, tree)
         # we found the price, now cut "EUR " and parse english format
@@ -59,12 +61,6 @@ def config_logger(debug):
     logger.setLevel(logging.DEBUG if debug else logging.INFO)
     handler = logging.StreamHandler()
     logger.addHandler(handler)
-
-def get_image(item, tree):
-    img = tree.xpath("//img[@id='landingImage']/@data-a-dynamic-image")[0]
-    obj = json.loads(img)
-    image_url = list(obj.keys())[0]
-    urllib.request.urlretrieve(image_url, "../logs/{}.jpg".format(item))
 
 def get_infos(item, tree):
     title = tree.xpath("//span[@id='productTitle']")[0].text.strip()

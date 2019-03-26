@@ -1,36 +1,44 @@
+@import 'helper';
+
+#menu-toggle {
+  position: absolute;
+  left: 50px;
+  bottom: 50px;
+  display: block;
+  height: 40px;
+  width: 40px;
+  line-height: 40px;
+  @include border-radius(20px);
+  background-color: black;
+  color: white;
+  text-align: center;
+}
+
 body {
   overflow-x: hidden;
 }
 
-#sidebar-wrapper {
+#sidebar-wrapper, #page-content-wrapper {
   height: 100vh;
   overflow-y: scroll;
   overflow-x: hidden;
-  margin-left: -20rem;
-  -webkit-transition: margin .25s ease-out;
-  -moz-transition: margin .25s ease-out;
-  -o-transition: margin .25s ease-out;
-  transition: margin .25s ease-out;
+  @include transition(margin-left .25s ease-out);
+  @include transition(margin-right .25s ease-out);
+}
+
+#sidebar-wrapper {
+  margin-left: 0;
   width: 20rem;
 }
 
-#sidebar-wrapper .sidebar-heading {
-  padding: 0.875rem 1.25rem;
-  font-size: 1.2rem;
-}
-
-// #sidebar-wrapper .list-group {
-// }
-
 #page-content-wrapper {
+  width: 100vw;
   min-width: 100vw;
-  height: 100vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  margin-right: 0;
 }
 
-#wrapper.toggled #sidebar-wrapper {
-  margin-left: 0;
+#wrapper.toggled #page-content-wrapper {
+  margin-right: -20rem;
 }
 
 .current {
@@ -58,5 +66,8 @@ body {
 
   #wrapper.toggled #sidebar-wrapper {
     margin-left: -20rem;
+  }
+  #wrapper.toggled #page-content-wrapper {
+    margin-right: 0;
   }
 }

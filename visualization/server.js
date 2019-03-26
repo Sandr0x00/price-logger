@@ -46,13 +46,34 @@ app.get('/prices/:id', (req, res) => {
 app.get('/img/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
-    let img = path.join(__dirname, '..', 'logs', `${id}.jpg`);
-    if (!fs.existsSync(img)) {
-        res.sendFile('public/img/unknown.jpg', { root: __dirname });
-    } else {
-        res.sendFile(img);
+    if (Object.keys(json).includes(id)) {
+        let img = path.join(__dirname, '..', 'logs', `${id}.jpg`);
+        if (fs.existsSync(img)) {
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.sendFile(img);
+            return;
+        }
     }
+    sendUnknownImg(res);
 });
+
+app.get('/placeholder/:id', (req, res) => {
+    setHeaders(res);
+    let id = req.params.id;
+    if (Object.keys(json).includes(id)) {
+        let img = path.join(__dirname, '..', 'logs', `${id}.thumbnail`);
+        if (fs.existsSync(img)) {
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.sendFile(img);
+            return;
+        }
+    }
+    sendUnknownImg(res);
+});
+
+function sendUnknownImg(res) {
+    res.sendFile('public/img/unknown.jpg', { root: __dirname });
+}
 
 app.get('/infos/:id', (req, res) => {
     setHeaders(res);
@@ -63,6 +84,26 @@ app.get('/infos/:id', (req, res) => {
         res.sendStatus(500);
     }
 });
+
+
+const exec = require('child_process').exec;
+
+app.get('/status', (req, res) => {
+    setHeaders(res);
+    exec('systemctl show visualization --no-page | grep ActiveState && systemctl show logger --no-page | grep ActiveState', (error, stdout, stderr) => {
+        if (!stdout) {
+            return;
+        }
+        let states = stdout.split('\n');
+        let visualization = states[0].split('=')[1];
+        let logger = states[1].split('=')[1];
+        res.send({
+            'visu': visualization,
+            'logger': logger
+        });
+    });
+});
+
 
 app.get('/items', (req, res) => {
     setHeaders(res);
@@ -140,20 +181,20 @@ function loadLogs() {
 
 
 function setHeaders(res) {
-    res.set('X-XSS-ProtectionType', '"1; mode=block"');
-    res.set('X-Frame-Options', 'SAMEORIGIN');
-    res.set('X-Content-Type-Options', 'nosniff');
-    res.set('Strict-Transport-Security', '"max-age=31536000; includeSubDomains; preload"');
-    res.set('Content-Security-Policy',
+    res.setHeader('X-XSS-ProtectionType', '"1; mode=block"');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Strict-Transport-Security', '"max-age=31536000; includeSubDomains; preload"');
+    res.setHeader('Content-Security-Policy',
         'default-src \'self\';'
         + 'img-src \'self\';'
         + 'style-src \'self\' \'unsafe-inline\' use.fontawesome.com;'
         + 'script-src \'self\' \'unsafe-inline\';'
         + 'font-src use.fontawesome.com;'
         + 'require-sri-for script style;');
-    res.set('X-Permitted-Cross-Domain-Policies', '"none"');
-    res.set('Referrer-Policy', 'no-referrer');
-    res.set('Feature-Policy', 'accelerometer \'none\'; camera \'none\'; geolocation \'none\'; gyroscope \'none\'; magnetometer \'none\'; microphone \'none\'; payment \'none\'; usb \'none\'; sync-xhr \'none\'');
+    res.setHeader('X-Permitted-Cross-Domain-Policies', '"none"');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    res.setHeader('Feature-Policy', 'accelerometer \'none\'; camera \'none\'; geolocation \'none\'; gyroscope \'none\'; magnetometer \'none\'; microphone \'none\'; payment \'none\'; usb \'none\'; sync-xhr \'none\'');
 }
 
 function loadJSON(p) {
