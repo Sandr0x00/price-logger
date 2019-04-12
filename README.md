@@ -46,18 +46,25 @@ visualization$ npm run deploy:install
 
 ```json
 {
-    "base_url": "https://www.amazon.de/dp/",
-    "price_selector": "EUR \\d+,\\d\\d",
     "items": [
         {
             "id": "B073FGSC7T",
+            "base_url": "https://www.amazon.de/dp/",
+            "price_selector": "EUR \\d+,\\d\\d",
+            "xpath_price": "//*[@id='priceblock_ourprice']",
+            "xpath_title": "//span[@id='productTitle']",
+            "xpath_img": "//img[@id='landingImage']/@data-a-dynamic-image",
             "threshold": 39
         },
         {
             "id": "B00008XX8F",
+            "base_url": "https://www.amazon.de/dp/",
+            "price_selector": "EUR \\d+,\\d\\d",
+            "xpath_price": "//*[@id='priceblock_ourprice']",
+            "xpath_title": "//span[@id='productTitle']",
+            "xpath_img": "//img[@id='landingImage']/@data-a-dynamic-image",
             "threshold": 18.5
         },
-        ...
     ],
     "poll": 7200,
     "poll_deviation": 1800,
@@ -68,7 +75,11 @@ visualization$ npm run deploy:install
         "from": "your-address@gmail.com",
         "password": "gmail-password",
         "to": "alerts-going-to-this@e.mail"
-    }
+    },
+    "user_agents": [
+        "Mozilla/...",
+        "Mozilla/...",
+    ]
 }
 ```
 
