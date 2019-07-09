@@ -98,7 +98,24 @@ function loadStatus() {
     xhr.onload = () => {
         let status = xhr.status;
         if (status == 200) {
-            $('#status').text(xhr.response);
+            let visu = xhr.response['visu-state'];
+            let visuTime = xhr.response['visu-time'];
+            let logger = xhr.response['logger-state'];
+            let loggerTime = xhr.response['logger-time'];
+            if (visu === 'active') {
+                $('#statusVisu').addClass('active');
+                $('#visuTime').text(visuTime);
+            } else {
+                $('#statusVisu').removeClass('active');
+                $('#visuTime').text('');
+            }
+            if (logger === 'active') {
+                $('#statusLogger').addClass('active');
+                $('#loggerTime').text(visuTime);
+            } else {
+                $('#statusLogger').removeClass('active');
+                $('#loggerTime').text('');
+            }
         }
     };
     xhr.send();

@@ -90,7 +90,7 @@ const exec = require('child_process').exec;
 
 app.get('/status', (req, res) => {
     setHeaders(res);
-    exec('systemctl show visualization --no-page | grep ActiveState && systemctl show logger --no-page | grep ActiveState', (error, stdout, stderr) => {
+    exec('systemctl show visualization --no-page | grep (ActiveState|) && systemctl show logger --no-page | grep ActiveState', (error, stdout, stderr) => {
         if (!stdout) {
             return;
         }
@@ -98,8 +98,10 @@ app.get('/status', (req, res) => {
         let visualization = states[0].split('=')[1];
         let logger = states[1].split('=')[1];
         res.send({
-            'visu': visualization,
-            'logger': logger
+            'visu-state': visualization,
+            'visu-time': 10,
+            'logger-state': logger,
+            'logger-time': 12
         });
     });
 });

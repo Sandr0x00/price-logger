@@ -2,18 +2,19 @@
   "private": true,
   "dependencies": {
     "compression": "^1.7.4",
-    "express": "^4.16.4",
-    "pug": "^2.0.3"
+    "express": "^4.17.1",
+    "pug": "^2.0.4"
   },
   "devDependencies": {
     "bootstrap": "^4.3.1",
-    "d3": "^5.9.1",
-    "jquery": "^3.3.1",
-    "node-sass": "^4.11.0",
-    "popper.js": "^1.14.7"
+    "d3": "^5.9.7",
+    "eslint": "^6.0.1",
+    "jquery": "^3.4.1",
+    "node-sass": "^4.12.0",
+    "popper.js": "^1.15.0"
   },
   "scripts": {
-    "test": "eslint .",
+    "test": "./node_modules/.bin/eslint .",
     "build:dev": "node-sass sass -o public/css && ./copy.py && npm run test",
     "build:prod": "npm run build:dev && tar -czf visualization.tar.gz public views package.json package-lock.json server.js",
     "deploy:copy": "scp visualization.tar.gz visualization.service pi@raspberrypi.fritz.box:~",

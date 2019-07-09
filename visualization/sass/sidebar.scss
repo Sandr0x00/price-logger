@@ -54,6 +54,18 @@ body {
   background-color: #aaf;
 }
 
+#status {
+  line-height: 30px;
+}
+
+#statusVisu, #statusLogger {
+  color: #c00;
+}
+
+.active {
+  color: #090;
+}
+
 @media (min-width: 768px) {
   #sidebar-wrapper {
     margin-left: 0;
@@ -64,10 +76,12 @@ body {
     width: 100%;
   }
 
-  #wrapper.toggled #sidebar-wrapper {
-    margin-left: -20rem;
-  }
-  #wrapper.toggled #page-content-wrapper {
-    margin-right: 0;
+  #wrapper.toggled {
+    #sidebar-wrapper {
+      margin-left: -20rem;
+    }
+    #page-content-wrapper {
+      margin-right: 0;
+    }
   }
 }

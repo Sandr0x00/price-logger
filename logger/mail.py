@@ -9,7 +9,10 @@ def send_mail(mail_config, item, price):
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(mail_config['smtp_url'], mail_config['smtp_port'], context=context) as server:
         message = MIMEMultipart("alternative")
-        message["Subject"] = "[Price-Logger] Alert: {}".format(item['title'])
+        if 'title' in item:
+            message["Subject"] = "[Price-Logger] Alert: {}".format(item['title'])
+        else:
+            message["Subject"] = "[Price-Logger] Alert: {}".format(item['id'])
         message["From"] = mail_config['from']
         message["To"] = mail_config['to']
 
@@ -31,12 +34,12 @@ def send_mail(mail_config, item, price):
         server.sendmail(mail_config['from'], mail_config["to"], message.as_string())
         return True
 
-def send_error(mail_config, error):
+def send_error(mail_config, error, subject):
     # Create a secure SSL context
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(mail_config['smtp_url'], mail_config['smtp_port'], context=context) as server:
         message = MIMEMultipart("alternative")
-        message["Subject"] = "[Price-Logger] Error"
+        message["Subject"] = "[Price-Logger] Error {}".format(subject)
         message["From"] = mail_config['from']
         message["To"] = mail_config['to']
 
