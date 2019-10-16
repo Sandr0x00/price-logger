@@ -11,6 +11,8 @@ const port = 3001;
 const fs = require('fs');
 let path = require('path');
 
+const config = loadJSON(path.join(__dirname, '..', 'logger', 'config.json'));
+
 app.set('port', port);
 app.locals.compileDebug = false;
 app.locals.cache = true;
@@ -76,7 +78,15 @@ app.get('/infos/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
     if (Object.keys(json).includes(id) && json[id].title) {
-        res.send({title: json[id].title});
+        let active = false;
+        if (config['items'].find(item => item.id == id)) {
+            active = true;
+        }
+
+        res.send({
+            title: json[id].title,
+            active: active
+        });
     } else {
         res.sendStatus(500);
     }

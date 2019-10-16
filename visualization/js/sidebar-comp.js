@@ -25,8 +25,10 @@ export class Sidebar extends BaseComp {
     }
 
     setCurrent(itemId) {
-        this.item = itemId;
-        loadingComp.navigate('/' + itemId);
+        if (this.item !== itemId) {
+            this.item = itemId;
+            loadingComp.navigate('/' + itemId);
+        }
     }
 
     render() {
@@ -35,7 +37,7 @@ export class Sidebar extends BaseComp {
         }
 
         let m = this.items.map(element => {
-            return html`<a class="list-group-item items ${this.item == element.id ? 'current' : ''}" data-id="${element.id}" id="${element.id}" onclick="sidebarComp.setCurrent('${element.id}')">${element.translation}</a>`;
+            return html`<a class="list-group-item items ${this.item == element.id ? 'current' : ''} ${element.active ? '' : 'inactive'}" data-id="${element.id}" id="${element.id}" onclick="sidebarComp.setCurrent('${element.id}')">${element.translation}</a>`;
         });
 
         loadingComp.close();
@@ -69,11 +71,12 @@ export class Sidebar extends BaseComp {
                 }).then((r) => {
                     return Promise.resolve({
                         id:item,
-                        translation:r.title
+                        translation:r.title,
+                        active: r.active
                     });
                 }));
             }));
-            this.items = arr;
+            this.items = arr.sort((i) => i.active ? -1 : 1);
         // }).catch(err => {
             // console.log(err);
             // if (err) {

@@ -42,7 +42,7 @@ body {
 }
 
 .current {
-  background: #ddf;
+  background: #fc3 !important;
 }
 
 .items {
@@ -51,7 +51,7 @@ body {
 
 .items:hover {
   color: inherit;
-  background-color: #aaf;
+  background-color: #fa0;
   cursor: pointer;
 }
 
@@ -65,6 +65,10 @@ body {
 
 .active {
   color: #090;
+}
+
+.inactive {
+  background: #ddd;
 }
 
 @media (min-width: 768px) {

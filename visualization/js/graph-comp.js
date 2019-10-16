@@ -33,7 +33,6 @@ class Graph extends BaseComp {
         return changedProperties.has('data');
     }
 
-
     render() {
         if (!this.data) {
             return html``;
