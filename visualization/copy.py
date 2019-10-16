@@ -46,11 +46,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(e)
     obj = {
-        'd3.min.js': copy('d3/dist/d3.min.js', 'd3.min.js', True),
-        'jquery.min.js': copy('jquery/dist/jquery.min.js', 'jquery.min.js', True),
-        'bootstrap.min.js': copy('bootstrap/dist/js/bootstrap.min.js', 'bootstrap.min.js', True, True),
         'bootstrap.min.css': copy('bootstrap/dist/css/bootstrap.min.css', 'bootstrap.min.css', src_map=True),
-        'popper.min.js': copy('popper.js/dist/umd/popper.min.js', 'popper.min.js', True, True)
     }
     with open('public/lib/integrity.json', 'w+') as f:
         f.write(json.dumps(obj))

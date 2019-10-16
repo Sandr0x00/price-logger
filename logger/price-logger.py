@@ -36,6 +36,7 @@ def get_price(item):
         logger.debug(e)
         mail.send_error(config['mail'], 'Can\'t connect, trying again later.', 'Connection failed')
         logger.warning('Can\'t connect, trying again later.')
+        return
     try:
         tree = lxml.html.fromstring(r.text)
         # extract the price from the string
@@ -59,14 +60,14 @@ def get_price(item):
         '''.format(
             config['user_agents'][ua],
             str(exc_value),
-            repr(traceback.format_tb(exc_traceback)).replace('\n','<br>'), 
+            repr(traceback.format_tb(exc_traceback)).replace('\n','<br>'),
             item['url'],
             item['id'],
             tree.xpath(item['xpath_price']),
             item['price_selector'],
             html.escape(r.text))
         mail.send_error(config['mail'], error, 'price not found')
-        logger.warning('Didn\'t find the \'price\' element, trying again later.')
+        logger.warning(f'Didn\'t find the \'price\' element for {item["id"]}, trying again later.')
     try:
         if not os.path.isfile('../logs/{}.jpg'.format(item['id'])):
             image.save_image(item, tree)
@@ -85,13 +86,13 @@ def get_price(item):
         '''.format(
             config['user_agents'][ua],
             str(exc_value),
-            repr(traceback.format_tb(exc_traceback)).replace('\n','<br>'), 
+            repr(traceback.format_tb(exc_traceback)).replace('\n','<br>'),
             item['url'],
             item['id'],
             tree.xpath(item['xpath_img']),
             html.escape(r.text))
         mail.send_error(config['mail'], error, 'image not found')
-        logger.warning('Didn\'t find the \'image\' element, trying again later.')
+        logger.warning(f'Didn\'t find the \'image\' element for {item["id"]}, trying again later.')
     try:
         if not 'title' in item:
             get_infos(item, tree)
@@ -108,13 +109,13 @@ def get_price(item):
         '''.format(
             config['user_agents'][ua],
             str(exc_value),
-            repr(traceback.format_tb(exc_traceback)).replace('\n','<br>'), 
+            repr(traceback.format_tb(exc_traceback)).replace('\n','<br>'),
             item['url'],
             item['id'],
             tree.xpath(item['xpath_title']),
             html.escape(r.text))
         mail.send_error(config['mail'], error, 'title not found')
-        logger.warning('Didn\'t find the \'title\' element, trying again later.')
+        logger.warning(f'Didn\'t find the \'title\' element for {item["id"]}, trying again later.')
 def get_config(config):
     with open(config, 'r') as f:
         return json.loads(f.read())
@@ -130,7 +131,8 @@ def get_infos(item, tree):
     title = tree.xpath(item['xpath_title'])[0].text.strip()
     item['title'] = title
     obj = {
-        "title": title
+        "title": title,
+        "url": item["url"]
     }
     with open('../logs/{}.json'.format(item['id']), 'w+') as file:
         file.write(json.dumps(obj, sort_keys=True, indent=4))

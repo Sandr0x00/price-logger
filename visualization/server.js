@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-/* global __dirname, require, console, module, setInterval */
+/* global __dirname, require */
 
 const express = require('express');
 const compression = require('compression');
@@ -11,10 +11,7 @@ const port = 3001;
 const fs = require('fs');
 let path = require('path');
 
-const config = loadJSON(path.join(__dirname, '..', 'logger', 'config.json'));
-
 app.set('port', port);
-app.set('view engine', 'pug');
 app.locals.compileDebug = false;
 app.locals.cache = true;
 app.use(express.static('public'));
@@ -79,7 +76,7 @@ app.get('/infos/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
     if (Object.keys(json).includes(id) && json[id].title) {
-        res.send(json[id].title);
+        res.send({title: json[id].title});
     } else {
         res.sendStatus(500);
     }
@@ -90,7 +87,7 @@ const exec = require('child_process').exec;
 
 app.get('/status', (req, res) => {
     setHeaders(res);
-    exec('systemctl show visualization --no-page | grep (ActiveState|) && systemctl show logger --no-page | grep ActiveState', (error, stdout, stderr) => {
+    exec('systemctl show visualization --no-page | grep (ActiveState|) && systemctl show logger --no-page | grep ActiveState', (error, stdout) => {
         if (!stdout) {
             return;
         }
@@ -111,28 +108,6 @@ app.get('/items', (req, res) => {
     setHeaders(res);
     res.send(Object.keys(json));
 });
-
-app.get('/', (req, res) => {
-    setHeaders(res);
-    render(res, Object.keys(json)[0]);
-});
-
-app.get('/:id', (req, res) => {
-    setHeaders(res);
-    render(res, req.params.id);
-});
-
-function render(res, id) {
-    if (!Object.keys(json).includes(id)) {
-        console.log(`render for id="${id}" requested, but missing`);
-        return;
-    }
-    res.render('index', {
-        items: Object.keys(json),
-        id: id,
-        base_url: config['base_url']
-    });
-}
 
 const server = http.createServer(app);
 server.listen(port, (err) => {
@@ -179,7 +154,7 @@ function loadLogs() {
         }
     });
     return logs;
-};
+}
 
 
 function setHeaders(res) {

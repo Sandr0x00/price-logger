@@ -35,6 +35,8 @@ def send_mail(mail_config, item, price):
         return True
 
 def send_error(mail_config, error, subject):
+    if not mail_config or mail_config == "":
+        return False
     # Create a secure SSL context
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(mail_config['smtp_url'], mail_config['smtp_port'], context=context) as server:

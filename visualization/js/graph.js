@@ -1,17 +1,17 @@
-/* global d3 */
+import * as d3 from 'd3';
 
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 const height = 600;
 const width = 900;
 const margin = { left: 60, top: 10, right: 60, bottom: 30 };
-const getRatio = side => (margin[side] / width) * 100 + '%';
-const marginRatio = {
-    left: getRatio('left'),
-    top: getRatio('top'),
-    right: getRatio('right'),
-    bottom: getRatio('bottom')
-};
+// const getRatio = side => (margin[side] / width) * 100 + '%';
+// const marginRatio = {
+//     left: getRatio('left'),
+//     top: getRatio('top'),
+//     right: getRatio('right'),
+//     bottom: getRatio('bottom')
+// };
 const svg = d3.select('#price-chart').append('svg')
     .attr('preserveAspectRatio', 'xMinYMin meet')
     .attr('viewBox', '0 0 ' + (width + margin.left + margin.right) + ' ' + (height + margin.top + margin.bottom))
@@ -40,7 +40,7 @@ Array.prototype.getMin = function(attrib) {
 };
 
 // mouse handlers
-function handleMouseOut(d, i) {
+function handleMouseOut(d) {
     // reset radius
     d3.select(this)
         .attr('r', 5);
@@ -49,7 +49,7 @@ function handleMouseOut(d, i) {
         .remove();
 }
 
-function handleMouseOver(d, i) {
+function handleMouseOver(d) {
     // increase radius
     d3.select(this)
         .attr('r', 10);
@@ -61,7 +61,7 @@ function handleMouseOver(d, i) {
         .text(() => d.price);
 }
 
-function initGraph() {
+export function initGraph() {
     // min price
     svg.append('line')
         .attr('id', 'minPriceLine')
@@ -96,12 +96,10 @@ function initGraph() {
     init = true;
 }
 
-function updateGraph(data) {
+export function updateGraph(prices) {
     if (!init) {
         return;
     }
-
-    const prices =  data.prices;
 
     const yMin = prices.getMin('price')['price'];
     const yMax = prices.getMax('price')['price'];

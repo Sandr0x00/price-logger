@@ -2,5 +2,7 @@ node_modules/
 __pycache__
 public/css/*
 public/lib/*
+public/index.js
+public/index.js.map
 !public/lib/integrity.json
 visualization.tar.gz

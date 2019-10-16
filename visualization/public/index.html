@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Price-Logger</title>
+    <link rel="stylesheet" href="/lib/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+        integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" , crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/graph.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/image.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+    <loading-dialog id="loadingComp"></loading-dialog>
+
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <sidebar-comp class="bg-light border-right" id="sidebar-wrapper"></sidebar-comp>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <main-router class="col-md-2 col-4"></main-router>
+                    <div id="price-chart" class="col-md-10 col-8">
+                    </div>
+                </div>
+            </div>
+            <a id="menu-toggle" class="d-block d-md-none">
+                <i class="fas fa-bars"></i>
+            </a>
+        </div>
+
+        <script type='text/javascript'>
+            const loadingComp = document.getElementById('loadingComp');
+            const sidebarComp = document.getElementById('sidebar-wrapper');
+        </script>
+        <script src="index.js"></script>
+    </div>
+</body>
