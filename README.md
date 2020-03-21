@@ -7,15 +7,21 @@ Could be used for other sites aswell.
 ![](readme.png)
 Controller blurred for copyright reasons.
 
+## Installation
+
+### Logger
+
+```shell
+logger$ sudo apt install python3-lxml
+logger$ sudo apt install libopenjp2-7-dev
+logger$ sudo apt install libtiff5-dev
+logger$ sudo pip3 install Pillow
+```
+
 # Scripts
 
 ## Locally
 
-### Logger
-```shell
-logger$ npm run install
-logger$ npm run start
-```
 
 ### Visualization
 ```shell
@@ -24,13 +30,6 @@ visualization$ npm start
 ```
 
 ## Deploy to production
-
-### Logger
-```shell
-logger$ npm run build
-logger$ npm run deploy:copy
-logger$ npm run deploy:install
-```
 
 ### Visualization
 ```shell
