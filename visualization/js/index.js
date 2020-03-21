@@ -1,4 +1,6 @@
-import './jquery-global.js';
+import jquery from 'jquery';
+window.jQuery = jquery;
+
 import 'bootstrap';
 import 'popper.js';
 import './loading.js';

@@ -8,7 +8,8 @@ export class Sidebar extends BaseComp {
     static get properties() {
         return {
             items: Array,
-            item: String
+            item: String,
+            status: Boolean
         };
     }
 
@@ -18,6 +19,7 @@ export class Sidebar extends BaseComp {
         this.items = [];
         this.loadItems();
         this.item = window.item;
+        this.status = false;
 
         setInterval(() => {
             this.loadItems();
@@ -43,26 +45,13 @@ export class Sidebar extends BaseComp {
         loadingComp.close();
         return html`
 <div class="list-group list-group-flush" id="sidebar">${m}</div>
-<div id="status">
-    <span>
-        <i id="statusVisu" class="fas fa-circle"></i> Visualization
-        <span id="visuTime"></span>
-    </span>
-    <br>
-    <span>
-        <i id="statusLogger" class="fas fa-cicle"></i> Logger
-        <span id="loggerTime"></span>
-    </span>
+<div id="status" class="list-group-item">
+    <i class="fas fa-circle ${this.status ? 'active' : 'nactive'}"></i> Logger
 </div>`;
     }
 
     loadItems() {
-        fetch('/items').then(response => {
-            if (response.status === 404) {
-                return Promise.reject(`Recipe for "${this.recipe}" does not exist.`);
-            }
-            return response;
-        }).then(response => response.json()
+        fetch('/items').then(response => response.json()
         ).then(async data => {
             let arr = [];
             await Promise.all(data.map(async (item) => {
@@ -74,6 +63,8 @@ export class Sidebar extends BaseComp {
                         translation:r.title,
                         active: r.active
                     });
+                }).catch(r => {
+                    console.log(r);
                 }));
             }));
             this.items = arr.sort((i) => i.active ? -1 : 1);
@@ -83,6 +74,11 @@ export class Sidebar extends BaseComp {
             //     dialogComp.show(err);
             // }
         });
+        fetch('/status').then(response => response.json()
+        ).then(data => {
+            this.status = data.status;
+        });
+
     }
 
 

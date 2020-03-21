@@ -6,10 +6,21 @@ const express = require('express');
 const compression = require('compression');
 const http = require('http');
 const app = express();
-const port = 3001;
+const port = 8084;
 
 const fs = require('fs');
 let path = require('path');
+
+const process = require('process');
+
+if (process.pid) {
+    // save PID for "make kill"
+    fs.writeFile('pid', process.pid, err => {
+        if (err) {
+            throw err;
+        }
+    });
+}
 
 const config = loadJSON(path.join(__dirname, '..', 'logger', 'config.json'));
 
@@ -18,6 +29,8 @@ app.locals.compileDebug = false;
 app.locals.cache = true;
 app.use(express.static('public'));
 app.use(compression());
+
+
 
 Object.filter = (obj, predicate) => {
     return Object.keys(obj)
@@ -87,6 +100,16 @@ app.get('/infos/:id', (req, res) => {
             title: json[id].title,
             active: active
         });
+    } else if (Object.keys(json).includes(id)) {
+        let active = false;
+        if (config['items'].find(item => item.id == id)) {
+            active = true;
+        }
+
+        res.send({
+            title: id,
+            active: active
+        });
     } else {
         res.sendStatus(500);
     }
@@ -97,18 +120,10 @@ const exec = require('child_process').exec;
 
 app.get('/status', (req, res) => {
     setHeaders(res);
-    exec('systemctl show visualization --no-page | grep (ActiveState|) && systemctl show logger --no-page | grep ActiveState', (error, stdout) => {
-        if (!stdout) {
-            return;
-        }
-        let states = stdout.split('\n');
-        let visualization = states[0].split('=')[1];
-        let logger = states[1].split('=')[1];
+    exec('ps -ef | grep [l]ogger', (error, stdout) => {
+        let status = stdout ? true : false;
         res.send({
-            'visu-state': visualization,
-            'visu-time': 10,
-            'logger-state': logger,
-            'logger-time': 12
+            'status': status
         });
     });
 });

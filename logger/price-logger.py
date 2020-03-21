@@ -61,12 +61,12 @@ Availability: {avail}""")
     log_price(item, price)
     history = item["last"]
     increase_poll = False
-    if len(history) > 5:
-        if min(history) == price and max(history) == price:
-            # nothing changed, increase poll
-            increase_poll = True
-        history.pop(0)
     history.append(price)
+    if min(history) == price and max(history) == price:
+        # nothing changed, increase poll
+        increase_poll = True
+    if len(history) > 5:
+        history.pop(0)
     item["last"] = history
     if price < item['threshold']:
         mail.send_mail(config['mail'], item, price)

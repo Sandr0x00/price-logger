@@ -6,3 +6,4 @@ public/index.js
 public/index.js.map
 !public/lib/integrity.json
 visualization.tar.gz
+dist/

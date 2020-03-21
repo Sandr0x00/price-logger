@@ -40,7 +40,7 @@ class Graph extends BaseComp {
         loadingComp.close();
         let img = html`<div class="productImg placeholder blur" data-large="/img/${this.itemId}" style="background-image: url('/placeholder/${this.itemId}')"></div>`;
         if (this.url) {
-            return html`<a class="productLink" href="${this.url ? this.url : '#'}">${img}</a>`;
+            return html`<a class="productLink" href="${this.url ? this.url : '#'}" target="_blank">${img}</a>`;
         } else {
             return img;
         }
