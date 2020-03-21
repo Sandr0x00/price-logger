@@ -15,7 +15,7 @@ Controller blurred for copyright reasons.
 logger$ sudo apt install python3-lxml
 logger$ sudo apt install libopenjp2-7-dev
 logger$ sudo apt install libtiff5-dev
-logger$ sudo pip3 install Pillow
+logger$ sudo pip3 install -r requirements
 ```
 
 # Scripts
