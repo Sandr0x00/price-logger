@@ -30,8 +30,6 @@ app.locals.cache = true;
 app.use(express.static('public'));
 app.use(compression());
 
-
-
 Object.filter = (obj, predicate) => {
     return Object.keys(obj)
         .filter(key => predicate(obj[key]))

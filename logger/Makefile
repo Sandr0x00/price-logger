@@ -15,11 +15,14 @@ nohup:
 
 kill:
 	@kill `cat pid`
-	@ps -ef | grep "price-loger"
+	@ps -ef | grep "[p]rice-logger"
+
+status:
+	@ps -ef | grep "[p]rice-logger"
 
 restart: kill nohup
 
-deploy: build
+deploy:
 ifdef TO
 	scp Makefile ${TO}:~/price-logger/logger
 	scp price-logger.py ${TO}:~/price-logger/logger

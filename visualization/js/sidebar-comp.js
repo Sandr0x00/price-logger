@@ -29,6 +29,7 @@ export class Sidebar extends BaseComp {
     setCurrent(itemId) {
         if (this.item !== itemId) {
             this.item = itemId;
+            console.log('setCurrent');
             loadingComp.navigate('/' + itemId);
         }
     }
@@ -78,48 +79,7 @@ export class Sidebar extends BaseComp {
         ).then(data => {
             this.status = data.status;
         });
-
     }
-
-
-    // loadStuff() {
-    //     if (!this.recipe) {
-    //         return;
-    //     }
-    //     fetch('/status').then(response => {
-    //         if (response.status === 404) {
-    //             return Promise.reject(`Recipe for "${this.recipe}" does not exist.`);
-    //         }
-    //         return response;
-    //     }).then(response => response.json()
-    //     ).then(data => {
-    //         this.data = data;
-    //         let visu = xhr.response['visu-state'];
-    //         let visuTime = xhr.response['visu-time'];
-    //         let logger = xhr.response['logger-state'];
-    //         let loggerTime = xhr.response['logger-time'];
-    //         if (visu === 'active') {
-    //             $('#statusVisu').addClass('active');
-    //             $('#visuTime').text(visuTime);
-    //         } else {
-    //             $('#statusVisu').removeClass('active');
-    //             $('#visuTime').text('');
-    //         }
-    //         if (logger === 'active') {
-    //             $('#statusLogger').addClass('active');
-    //             $('#loggerTime').text(visuTime);
-    //         } else {
-    //             $('#statusLogger').removeClass('active');
-    //             $('#loggerTime').text('');
-    //         }
-    //     }).catch(err => {
-    //         if (err) {
-    //             dialogComp.show(err);
-    //         }
-    //     });
-    // }
-
-
 }
 
 customElements.define('sidebar-comp', Sidebar);

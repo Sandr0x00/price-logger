@@ -50,6 +50,9 @@ def get_price(item, tree, url, text):
             avail = avail.strip()
             log_error("Price not found", url, f"""Selector {sel} empty
 Availability: {avail}""")
+            if avail == "Derzeit nicht verfügbar.":
+                item["url"] = None
+                log_info(item, "Disabled scraping.")
         return
     price = price[0].strip()
     g = re.match(item['price_selector'], price)
@@ -194,11 +197,11 @@ def main():
             'id': item['id'],
             'next_exec': current_time + initial_delay,
             "poll": poll_interval,
-            'url': urljoin(item['base_url'], item['id']),
             "last" : []
         }
         for i in item:
             items[item['id']][i] = item[i]
+        items[item['id']]['url'] = urljoin(item['base_url'], item['id'])
         if os.path.isfile('../logs/{}.json'.format(item['id'])):
             with open('../logs/{}.json'.format(item['id']), 'r+') as file:
                 loaded = json.load(file)
@@ -211,6 +214,10 @@ def main():
 
         for item_id, data in items.items():
             if data['next_exec'] < current_time:
+                if not items[item_id]['url']:
+                    # do not scrape again
+                    data['next_exec'] = current_time + (60 * 60 * 24 * 30)
+                    continue
                 if scrape(items[item_id]):
                     # increase poll intervall to a configured max
                     if data["poll"] != config["poll_timeout_max"]:
