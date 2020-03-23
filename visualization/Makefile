@@ -36,4 +36,8 @@ status:
 	ps -ef | grep "[n]ode server.js"
 
 deploy: dist
-	scp -rp -P 9681 dist/* pi@sandr0.tk:~/price-logger/visualization
+ifdef TO
+	scp -rp dist/* ${TO}:~/price-logger/visualization
+else
+	echo "Please call like this \"make deploy TO=pi@raspberrypi.fritz.box\""
+endif

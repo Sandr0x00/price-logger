@@ -50,7 +50,7 @@ def get_price(item, tree, url, text):
             avail = avail.strip()
             log_error("Price not found", url, f"""Selector {sel} empty
 Availability: {avail}""")
-            if avail == "Derzeit nicht verfügbar.":
+            if "Derzeit nicht verfügbar" in avail:
                 item["url"] = None
                 log_info(item, "Disabled scraping.")
         return
