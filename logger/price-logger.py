@@ -46,7 +46,13 @@ def get_price(item, tree, url, text):
             log_error("Price not found", url, f"""Selector {sel}
 {l}""")
         else:
-            avail = tree.xpath(item["xpath_avail"])[0]
+            avail = tree.xpath(item["xpath_avail"])
+            if len(avail) == 0:
+                # something went horribly wrong
+                log_error("Maybe amazon found out?", url, f"""Selector {sel} empty
+Availability: {avail}""")
+                return
+            avail = avail[0]
             avail = avail.strip()
             log_error("Price not found", url, f"""Selector {sel} empty
 Availability: {avail}""")
