@@ -51,7 +51,7 @@ def get_price(item, tree, url, text):
                 # something went horribly wrong
                 log_error("Maybe amazon found out?", url, f"""Selector {sel} empty
 Availability: {avail}""")
-                return
+                return True
             avail = avail[0]
             avail = avail.strip()
             log_error("Price not found", url, f"""Selector {sel} empty
@@ -59,7 +59,7 @@ Availability: {avail}""")
             if "Derzeit nicht verfügbar" in avail:
                 item["url"] = None
                 log_info(item, "Disabled scraping.")
-        return
+        return True
     price = price[0].strip()
     g = re.match(item['price_selector'], price)
     if not g:
