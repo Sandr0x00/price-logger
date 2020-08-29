@@ -39,5 +39,5 @@ deploy: dist
 ifdef TO
 	scp -rp dist/* ${TO}:~/price-logger/visualization
 else
-	echo "Please call like this \"make deploy TO=pi@raspberrypi.fritz.box\""
+	echo "Please call like this \"make deploy TO=<user>@<hostname>\""
 endif

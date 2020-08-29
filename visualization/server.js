@@ -10,17 +10,18 @@ const port = 8084;
 
 const fs = require('fs');
 let path = require('path');
+//const { exit } = require('process');
 
-const process = require('process');
+// const process = require('process');
 
-if (process.pid) {
-    // save PID for "make kill"
-    fs.writeFile('pid', process.pid, err => {
-        if (err) {
-            throw err;
-        }
-    });
-}
+// if (process.pid) {
+//     // save PID for "make kill"
+//     fs.writeFile('pid', process.pid, err => {
+//         if (err) {
+//             throw err;
+//         }
+//     });
+// }
 
 const config = loadJSON(path.join(__dirname, '..', 'logger', 'config.json'));
 
@@ -162,9 +163,15 @@ function loadLogs() {
                 return;
             }
             row = row.split(' - ');
+            let l = content.length;
+            let price = parseFloat(row[1]);
+            // remove additional entries which do not change anything
+            if (l > 1 && content[l - 2].price === price && content[l - 1].price === price) {
+                content.pop();
+            }
             content.push({
                 'time': Date.parse(row[0]),
-                'price': row[1]
+                'price': price
             });
         });
         logs[key] = {};

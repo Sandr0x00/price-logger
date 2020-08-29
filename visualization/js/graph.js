@@ -108,7 +108,7 @@ export function updateGraph(prices) {
     const diff = (yMax - yMin) * 0.1;
 
     xScale.domain([xMin, xMax]);
-    yScale.domain([yMin - diff, (yMax - -diff)]); // + does not work, because js is great
+    yScale.domain([yMin - diff, (yMax + diff)]);
     yAxis.scale(yScale);
     xAxis.scale(xScale);
 
