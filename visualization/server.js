@@ -37,11 +37,8 @@ Object.filter = (obj, predicate) => {
         .reduce((res, key) => (res[key] = obj[key], res), {});
 };
 
-let json = loadLogs();
-// cyclic update
-setInterval(() => {
-    json = loadLogs();
-}, 30000);
+let logs = {};
+loadLogs();
 
 // currently, this is not needed
 // let integrity = loadJSON(path.join(__dirname, 'public', 'lib', 'integrity.json'));
@@ -49,15 +46,15 @@ setInterval(() => {
 app.get('/prices/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
-    if (Object.keys(json).includes(id)) {
-        res.send(json[id]);
+    if (Object.keys(logs).includes(id)) {
+        res.send(logs[id]);
     }
 });
 
 app.get('/img/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
-    if (Object.keys(json).includes(id)) {
+    if (Object.keys(logs).includes(id)) {
         let img = path.join(__dirname, '..', 'logs', `${id}.jpg`);
         if (fs.existsSync(img)) {
             res.setHeader('Content-Type', 'image/jpeg');
@@ -71,7 +68,7 @@ app.get('/img/:id', (req, res) => {
 app.get('/placeholder/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
-    if (Object.keys(json).includes(id)) {
+    if (Object.keys(logs).includes(id)) {
         let img = path.join(__dirname, '..', 'logs', `${id}.thumbnail`);
         if (fs.existsSync(img)) {
             res.setHeader('Content-Type', 'image/jpeg');
@@ -89,29 +86,22 @@ function sendUnknownImg(res) {
 app.get('/infos/:id', (req, res) => {
     setHeaders(res);
     let id = req.params.id;
-    if (Object.keys(json).includes(id) && json[id].title) {
-        let active = false;
+    let active = false;
+    if (Object.keys(logs).includes(id)) {
         if (config['items'].find(item => item.id == id)) {
             active = true;
         }
-
-        res.send({
-            title: json[id].title,
-            active: active
-        });
-    } else if (Object.keys(json).includes(id)) {
-        let active = false;
-        if (config['items'].find(item => item.id == id)) {
-            active = true;
-        }
-
-        res.send({
-            title: id,
-            active: active
-        });
     } else {
         res.sendStatus(500);
     }
+    let title = id;
+    if (logs[id].title) {
+        title = logs[id].title;
+    }
+    res.send({
+        title: title,
+        active: active
+    });
 });
 
 
@@ -127,10 +117,34 @@ app.get('/status', (req, res) => {
     });
 });
 
-
 app.get('/items', (req, res) => {
     setHeaders(res);
-    res.send(Object.keys(json));
+
+    let infos = {};
+    for (const [id, obj] of Object.entries(logs)) {
+        let title = id;
+        if (obj.title) {
+            title = obj.title;
+        }
+        infos[id] = {};
+        infos[id].title = title;
+        let active = false;
+        if (config['items'].find(item => item.id == id)) {
+            active = true;
+        }
+        infos[id].active = active;
+    }
+    res.send(infos);
+});
+
+app.post('/reload/:id', (req, res) => {
+    let id = req.params.id;
+    console.log(`reload ${id}`);
+    if (!/B[0-9A-Z]{9}/.test(id)) {
+        res.sendStatus(404);
+    }
+    loadLog(id);
+    res.sendStatus(200);
 });
 
 const server = http.createServer(app);
@@ -141,8 +155,40 @@ server.listen(port, (err) => {
     console.log(`server is listening on ${port}`);
 });
 
+
+function loadLog(id) {
+    let filePath = path.join(__dirname, '..', 'logs', `${id}.txt`);
+    let fileContent = fs.readFileSync(filePath, 'utf8').split('\n');
+    let content = [];
+    fileContent.forEach(row => {
+        if (row.length == 0) {
+            return;
+        }
+        row = row.split(' - ');
+        let l = content.length;
+        let price = parseFloat(row[1]);
+        // remove additional entries which do not change anything
+        if (l > 1 && content[l - 2].price === price && content[l - 1].price === price) {
+            content.pop();
+        }
+        content.push({
+            'time': Date.parse(row[0]),
+            'price': price
+        });
+    });
+    logs[id] = {};
+    logs[id].prices = content;
+    logs[id].id = id;
+    // try to add additional infos
+    let infos = loadJSON(path.join(__dirname, '..', 'logs', `${id}.json`));
+    if (infos) {
+        logs[id] = Object.assign(infos, logs[id]);
+    }
+}
+
 function loadLogs() {
-    let logs = {};
+    // clear logs
+    logs = {};
     let dirPath = path.join(__dirname, '..', 'logs');
     fs.readdirSync(dirPath).forEach(fileName => {
         let filePath = path.join(dirPath, fileName);
@@ -156,34 +202,8 @@ function loadLogs() {
         if (file.ext != '.txt') {
             return;
         }
-        let fileContent = fs.readFileSync(filePath, 'utf8').split('\n');
-        let content = [];
-        fileContent.forEach(row => {
-            if (row.length == 0) {
-                return;
-            }
-            row = row.split(' - ');
-            let l = content.length;
-            let price = parseFloat(row[1]);
-            // remove additional entries which do not change anything
-            if (l > 1 && content[l - 2].price === price && content[l - 1].price === price) {
-                content.pop();
-            }
-            content.push({
-                'time': Date.parse(row[0]),
-                'price': price
-            });
-        });
-        logs[key] = {};
-        logs[key].prices = content;
-        logs[key].id = key;
-        // try to add additional infos
-        let infos = loadJSON(path.join(__dirname, '..', 'logs', `${key}.json`));
-        if (infos) {
-            logs[key] = Object.assign(infos, logs[key]);
-        }
+        loadLog(key);
     });
-    return logs;
 }
 
 

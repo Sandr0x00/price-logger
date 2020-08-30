@@ -30,6 +30,8 @@ def log_price(item, price):
         log_info(item, f"{price:.2f}")
     with open(f'../logs/{item["id"]}.txt', 'a+') as file:
         file.write(f"{current_time} - {price:.2f}\n")
+    # notify server to load file anew
+    requests.post(f"http://localhost:8084/reload/{item['id']}")
 
 def log_error(msg_short, url, msg):
     msg_mail = msg.replace('\n', '<br/>')
@@ -180,6 +182,8 @@ def main():
     global config
     global DEBUG
 
+    intermediate_file = ".intermediate"
+
     args = parse_args()
     DEBUG = args.debug
     config = get_config(args.config)
@@ -194,29 +198,42 @@ def main():
     if not os.path.exists('../logs'):
         os.mkdir('../logs')
 
+    if os.path.exists(intermediate_file):
+        with open(intermediate_file, 'r') as f:
+            items = json.loads(f.read())
+    else:
+        items = {}
+
     # build item list
-    items = {}
     for item in config['items']:
         initial_delay = random.randint(0, poll_interval)
         current_time = datetime.now().timestamp()
-        items[item['id']] = {
-            'id': item['id'],
+        item_id = item["id"]
+        if item_id in items:
+            # at least update xpath values
+            items[item_id]["xpath_price"] = item["xpath_price"]
+            items[item_id]["xpath_avail"] = item["xpath_avail"]
+            items[item_id]["xpath_title"] = item["xpath_title"]
+            items[item_id]["xpath_img"] = item["xpath_img"]
+            continue
+        items[item_id] = {
+            'id': item_id,
             'next_exec': current_time + initial_delay,
             "poll": poll_interval,
             "last" : []
         }
         for i in item:
-            items[item['id']][i] = item[i]
-        items[item['id']]['url'] = urljoin(item['base_url'], item['id'])
-        if os.path.isfile('../logs/{}.json'.format(item['id'])):
-            with open('../logs/{}.json'.format(item['id']), 'r+') as file:
+            items[item_id][i] = item[i]
+        items[item_id]['url'] = urljoin(item['base_url'], item_id)
+        if os.path.isfile('../logs/{}.json'.format(item_id)):
+            with open('../logs/{}.json'.format(item_id), 'r+') as file:
                 loaded = json.load(file)
                 if 'title' in loaded:
-                    items[item['id']]['title'] = loaded['title']
+                    items[item_id]['title'] = loaded['title']
         # print(items[item['id']])
 
     while True:
-        current_time = datetime.now().timestamp()
+        current_time = int(datetime.now().timestamp())
 
         for item_id, data in items.items():
             if data['next_exec'] < current_time:
@@ -237,6 +254,10 @@ def main():
                     log_info(data, f"Poll intervall resetted to {data['poll']}")
 
                 data['next_exec'] = current_time + random.randint(data["poll"] - poll_deviation, data["poll"] + poll_deviation)
+                # save current status to continue after restart
+                # print(items)
+                with open(intermediate_file, "w") as f:
+                    f.write(json.dumps(items))
 
         time.sleep(config["check_timeout"])
 

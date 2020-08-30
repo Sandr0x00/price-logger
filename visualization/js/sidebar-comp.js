@@ -20,16 +20,12 @@ export class Sidebar extends BaseComp {
         this.loadItems();
         this.item = window.item;
         this.status = false;
-
-        setInterval(() => {
-            this.loadItems();
-        }, 1000 * 60);
     }
 
     setCurrent(itemId) {
         if (this.item !== itemId) {
             this.item = itemId;
-            console.log('setCurrent');
+            this.loadItems();
             loadingComp.navigate('/' + itemId);
         }
     }
@@ -40,7 +36,7 @@ export class Sidebar extends BaseComp {
         }
 
         let m = this.items.map(element => {
-            return html`<a class="list-group-item items ${this.item == element.id ? 'current' : ''} ${element.active ? '' : 'inactive'}" data-id="${element.id}" id="${element.id}" onclick="sidebarComp.setCurrent('${element.id}')">${element.translation}</a>`;
+            return html`<a class="list-group-item items ${this.item == element.id ? 'current' : ''} ${element.active ? '' : 'inactive'}" data-id="${element.id}" id="${element.id}" onclick="sidebarComp.setCurrent('${element.id}')">${element.title}</a>`;
         });
 
         loadingComp.close();
@@ -53,27 +49,13 @@ export class Sidebar extends BaseComp {
 
     loadItems() {
         fetch('/items').then(response => response.json()
-        ).then(async data => {
-            let arr = [];
-            await Promise.all(data.map(async (item) => {
-                arr.push(await fetch('/infos/' + item).then(resp => {
-                    return resp.json();
-                }).then((r) => {
-                    return Promise.resolve({
-                        id:item,
-                        translation:r.title,
-                        active: r.active
-                    });
-                }).catch(r => {
-                    console.log(r);
-                }));
-            }));
-            this.items = arr.sort((i) => i.active ? -1 : 1);
-        // }).catch(err => {
-            // console.log(err);
-            // if (err) {
-            //     dialogComp.show(err);
-            // }
+        ).then(data => {
+            let items = [];
+            for (let key in data) {
+                data[key].id = key;
+                items.push(data[key]);
+            }
+            this.items = items.sort((i) => i.active ? -1 : 1);
         });
         fetch('/status').then(response => response.json()
         ).then(data => {
