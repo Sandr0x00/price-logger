@@ -230,7 +230,18 @@ def main():
                 loaded = json.load(file)
                 if 'title' in loaded:
                     items[item_id]['title'] = loaded['title']
-        # print(items[item['id']])
+    delete = []
+    for item in items:
+        found = False
+        for c in config["items"]:
+            if item == c["id"]:
+                found = True
+                break
+        if not found:
+            delete.append(item)
+    for item in delete:
+        print(f"Delete {item} from intermediate since it is no longer in config file.")
+        del items[item]
 
     while True:
         current_time = int(datetime.now().timestamp())
