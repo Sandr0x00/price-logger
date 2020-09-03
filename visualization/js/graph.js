@@ -130,7 +130,7 @@ export function updateGraph(prices) {
         .duration(transitionDuration)
         .attr('y', yScale(yMin) + 4)
         .attr('x', width + 10)
-        .text(yMin);
+        .text(yMin.toFixed(2));
     let lastPrice = prices.slice(-1)[0].price;
     if (yMin != lastPrice) {
         svg.select('#currentPriceText')
@@ -138,7 +138,7 @@ export function updateGraph(prices) {
             .duration(transitionDuration)
             .attr('y', yScale(lastPrice) + 4)
             .attr('x', width + 10)
-            .text(lastPrice);
+            .text(lastPrice.toFixed(2));
     } else {
         svg.select('#currentPriceText')
             .transition()

@@ -10,18 +10,6 @@ const port = 8084;
 
 const fs = require('fs');
 let path = require('path');
-//const { exit } = require('process');
-
-// const process = require('process');
-
-// if (process.pid) {
-//     // save PID for "make kill"
-//     fs.writeFile('pid', process.pid, err => {
-//         if (err) {
-//             throw err;
-//         }
-//     });
-// }
 
 const config = loadJSON(path.join(__dirname, '..', 'logger', 'config.json'));
 
