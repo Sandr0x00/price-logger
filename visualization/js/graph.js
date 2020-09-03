@@ -40,25 +40,28 @@ Array.prototype.getMin = function(attrib) {
 };
 
 // mouse handlers
-function handleMouseOut(d) {
+function handleMouseOut() {
     // reset radius
     d3.select(this)
         .attr('r', 5);
     // remove text
-    d3.select('#t' + d.time)
+    let obj = this.__data__;
+    d3.select('#t' + obj.time)
         .remove();
 }
 
-function handleMouseOver(d) {
+function handleMouseOver() {
     // increase radius
     d3.select(this)
         .attr('r', 10);
     // display price
+    let obj = this.__data__;
+    console.log(obj)
     svg.append('text')
-        .attr('id', 't' + d.time)
-        .attr('x', () => xScale(d.time))
-        .attr('y', () => yScale(d.price) - 15)
-        .text(() => d.price);
+        .attr('id', 't' + obj.time)
+        .attr('x', () => xScale(obj.time))
+        .attr('y', () => yScale(obj.price) - 15)
+        .text(() => obj.price.toFixed(2));
 }
 
 export function initGraph() {
