@@ -138,7 +138,7 @@ export function updateGraph(prices) {
             .duration(transitionDuration)
             .attr('y', yScale(lastPrice) + 4)
             .attr('x', width + 10)
-            .text(yMin);
+            .text(lastPrice);
     } else {
         svg.select('#currentPriceText')
             .transition()

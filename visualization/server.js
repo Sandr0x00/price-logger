@@ -38,6 +38,7 @@ Object.filter = (obj, predicate) => {
 };
 
 let logs = {};
+let infos = {};
 loadLogs();
 
 // currently, this is not needed
@@ -119,32 +120,25 @@ app.get('/status', (req, res) => {
 
 app.get('/items', (req, res) => {
     setHeaders(res);
-
-    let infos = {};
-    for (const [id, obj] of Object.entries(logs)) {
-        let title = id;
-        if (obj.title) {
-            title = obj.title;
-        }
-        infos[id] = {};
-        infos[id].title = title;
-        let active = false;
-        if (config['items'].find(item => item.id == id)) {
-            active = true;
-        }
-        infos[id].active = active;
-    }
     res.send(infos);
 });
 
 app.post('/reload/:id', (req, res) => {
     let id = req.params.id;
-    console.log(`reload ${id}`);
-    if (!/B[0-9A-Z]{9}/.test(id)) {
-        res.sendStatus(404);
+    if (!/[0-9A-Za-z-]*/.test(id) || !loadLog(id)) {
+        return res.sendStatus(404);
     }
-    loadLog(id);
-    res.sendStatus(200);
+    infos[id].active = true;
+    return res.sendStatus(200);
+});
+
+app.post('/delete/:id', (req, res) => {
+    let id = req.params.id;
+    if (!(id in infos)) {
+        return res.sendStatus(404);
+    }
+    infos[id].active = false;
+    return res.sendStatus(200);
 });
 
 const server = http.createServer(app);
@@ -158,6 +152,9 @@ server.listen(port, (err) => {
 
 function loadLog(id) {
     let filePath = path.join(__dirname, '..', 'logs', `${id}.txt`);
+    if (!fs.existsSync(filePath)) {
+        return false;
+    }
     let fileContent = fs.readFileSync(filePath, 'utf8').split('\n');
     let content = [];
     fileContent.forEach(row => {
@@ -180,10 +177,11 @@ function loadLog(id) {
     logs[id].prices = content;
     logs[id].id = id;
     // try to add additional infos
-    let infos = loadJSON(path.join(__dirname, '..', 'logs', `${id}.json`));
-    if (infos) {
-        logs[id] = Object.assign(infos, logs[id]);
+    let info = loadJSON(path.join(__dirname, '..', 'logs', `${id}.json`));
+    if (info) {
+        logs[id] = Object.assign(info, logs[id]);
     }
+    return true;
 }
 
 function loadLogs() {
@@ -204,6 +202,19 @@ function loadLogs() {
         }
         loadLog(key);
     });
+    for (const [id, obj] of Object.entries(logs)) {
+        let title = id;
+        if (obj.title) {
+            title = obj.title;
+        }
+        infos[id] = {};
+        infos[id].title = title;
+        let active = false;
+        if (config['items'].find(item => item.id == id)) {
+            active = true;
+        }
+        infos[id].active = active;
+    }
 }
 
 
