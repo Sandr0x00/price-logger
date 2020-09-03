@@ -71,6 +71,8 @@ export function initGraph() {
         .attr('class', 'minPrice');
     svg.append('text')
         .attr('id', 'minPriceText');
+    svg.append('text')
+        .attr('id', 'currentPriceText');
 
     // line graph
     svg.append('path')
@@ -104,10 +106,10 @@ export function updateGraph(prices) {
         return;
     }
 
-    const yMin = prices.getMin('price')['price'];
-    const yMax = prices.getMax('price')['price'];
-    const xMin = prices.getMin('time')['time'];
-    const xMax = prices.getMax('time')['time'];
+    const yMin = prices.getMin('price').price;
+    const yMax = prices.getMax('price').price;
+    const xMin = prices.getMin('time').time;
+    const xMax = prices.getMax('time').time;
     const diff = (yMax - yMin) * 0.1;
 
     xScale.domain([xMin, xMax]);
@@ -129,6 +131,21 @@ export function updateGraph(prices) {
         .attr('y', yScale(yMin) + 4)
         .attr('x', width + 10)
         .text(yMin);
+    let lastPrice = prices.slice(-1)[0].price;
+    if (yMin != lastPrice) {
+        svg.select('#currentPriceText')
+            .transition()
+            .duration(transitionDuration)
+            .attr('y', yScale(lastPrice) + 4)
+            .attr('x', width + 10)
+            .text(yMin);
+    } else {
+        svg.select('#currentPriceText')
+            .transition()
+            .duration(transitionDuration)
+            .text('');
+    }
+
 
     // line generator
     let line = d3.line()
